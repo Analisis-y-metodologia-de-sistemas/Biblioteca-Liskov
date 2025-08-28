@@ -28,6 +28,9 @@ Instrucciones paso a paso para instalar, configurar y ejecutar el sistema.
 ### 🧪 [Guía de Testing](docs/TESTING.md)
 Documentación sobre la estrategia de testing, cómo ejecutar tests y escribir nuevos.
 
+### 📋 [Casos de Uso](docs/USE_CASES.md)
+Especificación completa de casos de uso por tipo de usuario, con flujos detallados y reglas de negocio.
+
 ## 🏛️ Arquitectura en Resumen
 
 ```mermaid
@@ -143,6 +146,7 @@ Este proyecto es parte del curso de Análisis y Metodología de Sistemas.
 - **[Documentación Completa](docs/)**
 - **[Arquitectura Detallada](docs/ARCHITECTURE.md)**
 - **[Patrones de Diseño](docs/DESIGN_PATTERNS.md)**
+- **[Casos de Uso](docs/USE_CASES.md)**
 - **[Tests y Calidad](docs/TESTING.md)**
 
 ---
