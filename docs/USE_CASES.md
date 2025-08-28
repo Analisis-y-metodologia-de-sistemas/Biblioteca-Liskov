@@ -319,15 +319,14 @@ El Sistema de Gestión de Biblioteca Liskov está diseñado para atender las nec
 
 ## Diagramas de Casos de Uso
 
-### 🎯 Vista General del Sistema
+El Sistema de Biblioteca Liskov está diseñado para atender tres tipos principales de usuarios, cada uno con diferentes niveles de acceso y funcionalidades específicas. El sistema opera bajo un modelo de privilegios escalonados donde:
 
-El siguiente diagrama muestra una vista completa de todos los casos de uso del sistema, organizados por paquetes funcionales y mostrando las relaciones entre los diferentes actores (Alumno, Docente, Bibliotecario y Sistema). Este diagrama presenta la arquitectura funcional completa del Sistema de Biblioteca Liskov, incluyendo las dependencias y extensiones entre casos de uso.
+- **👨‍🎓 Alumnos**: Tienen acceso a funcionalidades básicas de consulta, préstamo y reserva con restricciones estándar
+- **👨‍🏫 Docentes**: Disfrutan de privilegios extendidos con préstamos de mayor duración, reservas prioritarias y acceso a colecciones especiales
+- **👩‍💼 Bibliotecarios**: Poseen control administrativo completo del sistema, incluyendo gestión de usuarios, reportes y configuración
 
-![Casos de Uso Generales](casos-de-uso.png)
+Los siguientes diagramas muestran las capacidades específicas de cada actor, organizadas por áreas funcionales y destacando las relaciones entre casos de uso. Cada diagrama utiliza codificación por colores para agrupar funcionalmente los casos de uso y facilitar su comprensión.
 
-**Explicación del diagrama**: Este diagrama presenta la vista completa del sistema organizada en 7 paquetes principales: Gestión de Usuarios, Gestión de Items, Gestión de Préstamos, Gestión de Reservas, Gestión de Multas, Reportes y Consultas, y Sistema de Menús Interactivos. Cada actor tiene diferentes niveles de acceso, donde el Bibliotecario tiene privilegios administrativos completos, el Docente tiene funcionalidades extendidas, y el Alumno tiene acceso básico. El Sistema actor representa las funciones automáticas como generación de multas y notificaciones.
-
----
 
 ### 👨‍🎓 Casos de Uso - Alumno
 
