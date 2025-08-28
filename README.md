@@ -47,33 +47,119 @@ Sistema de gestión bibliotecaria implementado siguiendo principios de **Clean A
 ### 🏭 Patrones de Diseño GoF
 
 #### Repository Pattern
+
+**¿Qué es?**: Patrón que encapsula la lógica de acceso a datos y centraliza las consultas comunes. Actúa como una colección en memoria de objetos del dominio.
+
+**¿Por qué usarlo?**: 
+- Separa la lógica de negocio de la persistencia
+- Facilita testing mediante mocks/stubs
+- Permite cambiar el almacén de datos sin afectar la lógica de negocio
+- Centraliza consultas complejas
+
+**Principios involucrados**:
+- **Single Responsibility**: Cada repository maneja un solo agregado
+- **Dependency Inversion**: Domain define la interfaz, Infrastructure la implementa
+- **Open/Closed**: Extensible para nuevas consultas sin modificar existentes
+
 ```python
-# Interface (Puerto)
+# Interface (Puerto) - Dominio define el contrato
 class UsuarioRepository(ABC):
     @abstractmethod
     def obtener_por_email(self, email: str) -> Optional[Usuario]:
+        """Busca usuario por email único"""
+        pass
+    
+    @abstractmethod
+    def obtener_por_id(self, id: int) -> Optional[Usuario]:
+        """Busca usuario por ID"""
+        pass
+    
+    @abstractmethod
+    def crear(self, usuario: Usuario) -> Usuario:
+        """Persiste nuevo usuario"""
         pass
 
-# Implementación (Adaptador)
+# Implementación (Adaptador) - Infrastructure implementa el contrato
 class SQLiteUsuarioRepository(UsuarioRepository):
+    def __init__(self, connection: sqlite3.Connection):
+        self.connection = connection
+    
     def obtener_por_email(self, email: str) -> Optional[Usuario]:
-        # Implementación específica SQLite
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM usuarios WHERE email = ?", (email,))
+        row = cursor.fetchone()
+        return self._map_to_entity(row) if row else None
+    
+    def _map_to_entity(self, row) -> Usuario:
+        # Mapeo de datos de BD a entidad de dominio
+        return Usuario(id=row[0], nombre=row[1], email=row[2])
 ```
 
 **Ubicación**: `src/domain/repositories.py` (interfaces), `src/infrastructure/repositories.py` (implementaciones)
-**Propósito**: Abstrae el acceso a datos del dominio de negocio
+**Beneficio**: Domain layer no conoce detalles de SQLite, MongoDB, o cualquier BD específica
 
 #### Service Layer Pattern
+
+**¿Qué es?**: Capa que define las operaciones disponibles en la aplicación y coordina la respuesta de la aplicación para cada operación. Encapsula la lógica de aplicación.
+
+**¿Por qué usarlo?**:
+- Mantiene transaccionalidad entre múltiples operaciones
+- Coordina múltiples objetos de dominio
+- Proporciona una API clara para casos de uso
+- Maneja la lógica de aplicación (no de dominio)
+
+**Principios involucrados**:
+- **Single Responsibility**: Cada servicio maneja un área funcional específica
+- **Dependency Inversion**: Depende de interfaces, no implementaciones concretas
+- **Interface Segregation**: Servicios específicos por dominio funcional
+
 ```python
 class PrestamoService:
-    def __init__(self, prestamo_repo: PrestamoRepository, 
+    def __init__(self, 
+                 prestamo_repo: PrestamoRepository, 
                  item_repo: ItemRepository, 
-                 usuario_repo: UsuarioRepository):
-        # Inyección de dependencias
+                 usuario_repo: UsuarioRepository,
+                 logger: Logger):
+        # Inyección de dependencias - NO instanciación
+        self.prestamo_repo = prestamo_repo
+        self.item_repo = item_repo  
+        self.usuario_repo = usuario_repo
+        self.logger = logger
+    
+    def realizar_prestamo(self, usuario_id: int, item_id: int) -> Prestamo:
+        """Caso de uso: Realizar préstamo de libro"""
+        # 1. Validaciones de negocio
+        usuario = self._obtener_usuario_valido(usuario_id)
+        item = self._obtener_item_disponible(item_id)
+        
+        # 2. Aplicar reglas de dominio
+        if not usuario.puede_realizar_prestamos():
+            raise UsuarioConRestriccionesError("Usuario tiene multas pendientes")
+        
+        if not item.esta_disponible():
+            raise ItemNoDisponibleError("Item sin stock disponible")
+        
+        # 3. Coordinar operaciones transaccionales
+        prestamo = Prestamo(usuario_id=usuario_id, item_id=item_id)
+        prestamo_creado = self.prestamo_repo.crear(prestamo)
+        item.reducir_disponibilidad()
+        self.item_repo.actualizar(item)
+        
+        # 4. Logging de auditoria
+        self.logger.info(f"Préstamo realizado: {prestamo_creado.id}")
+        
+        return prestamo_creado
+    
+    def _obtener_usuario_valido(self, usuario_id: int) -> Usuario:
+        """Helper method - Validación común"""
+        usuario = self.usuario_repo.obtener_por_id(usuario_id)
+        if not usuario:
+            raise UsuarioNoEncontradoError(f"Usuario {usuario_id} no existe")
+        return usuario
 ```
 
 **Ubicación**: `src/application/services.py`
-**Propósito**: Orquesta operaciones de dominio y mantiene transaccionalidad
+**Beneficio**: Separa lógica de aplicación (orquestación) de lógica de dominio (reglas de negocio)
 
 #### Domain Model Pattern
 ```python
@@ -131,13 +217,200 @@ class Container:
 **Beneficio**: Datos estructurados sin lógica de persistencia
 
 #### Unit of Work Pattern (Simplificado)
-**Implementación**: Transacciones a nivel de servicio
+
+**¿Qué es?**: Patrón que mantiene una lista de objetos afectados por una transacción de negocio y coordina la escritura de cambios y resolución de problemas de concurrencia.
+
+**¿Por qué usarlo?**:
+- Garantiza atomicidad en operaciones complejas
+- Maneja transacciones de base de datos
+- Evita inconsistencias parciales
+- Centraliza control de transacciones
+
+**Principios involucrados**:
+- **Atomicity**: Todo se ejecuta o nada se ejecuta
+- **Consistency**: Mantiene invariantes del dominio
+- **Single Responsibility**: Se encarga solo de coordinar transacciones
+
+**Implementación en el proyecto**:
 ```python
-def realizar_prestamo(self, usuario_id: int, item_id: int) -> Prestamo:
-    # Operación atómica - todo éxito o todo falla
-    prestamo = self.prestamo_repo.crear(...)
-    self.item_repo.reducir_disponibilidad(item_id)
-    return prestamo
+class PrestamoService:
+    def realizar_prestamo(self, usuario_id: int, item_id: int) -> Prestamo:
+        """Unit of Work implícito - Operación transaccional completa"""
+        try:
+            # BEGIN TRANSACTION (implícita)
+            
+            # 1. Validar estado inicial
+            usuario = self.usuario_repo.obtener_por_id(usuario_id)
+            item = self.item_repo.obtener_por_id(item_id)
+            self._validar_prestamo_posible(usuario, item)
+            
+            # 2. Realizar cambios coordinados
+            prestamo = Prestamo(usuario_id=usuario_id, item_id=item_id)
+            prestamo_creado = self.prestamo_repo.crear(prestamo)
+            
+            # 3. Actualizar estado del item
+            item.reducir_disponibilidad()  # Modifica el aggregate
+            self.item_repo.actualizar(item)  # Persiste el cambio
+            
+            # 4. Log de auditoria
+            self.logger.info(f"Préstamo {prestamo_creado.id} completado")
+            
+            # COMMIT TRANSACTION (implícita)
+            return prestamo_creado
+            
+        except Exception as e:
+            # ROLLBACK TRANSACTION (implícita)
+            self.logger.error(f"Error en préstamo: {e}")
+            raise PrestamoFailedError("No se pudo completar el préstamo") from e
+
+# Implementación más explícita con contexto de transacción
+class TransactionalPrestamoService:
+    def __init__(self, unit_of_work: UnitOfWork):
+        self.uow = unit_of_work
+    
+    def realizar_prestamo(self, usuario_id: int, item_id: int) -> Prestamo:
+        with self.uow:  # Context manager para transacciones
+            # Todas las operaciones dentro del contexto son transaccionales
+            usuario = self.uow.usuarios.obtener_por_id(usuario_id)
+            item = self.uow.items.obtener_por_id(item_id)
+            
+            prestamo = Prestamo(usuario_id=usuario_id, item_id=item_id)
+            self.uow.prestamos.crear(prestamo)
+            
+            item.reducir_disponibilidad()
+            self.uow.items.actualizar(item)
+            
+            # Commit automático al salir del context manager
+            return prestamo
+```
+
+**Ubicación**: Implementación simplificada en servicios de `src/application/services.py`
+**Beneficio avanzado**: Una implementación completa incluiría un UnitOfWork explicit con context managers para manejo de transacciones más robusto
+
+### 🏛️ Layered Architecture (Arquitectura en Capas)
+
+**¿Qué es?**: Patrón arquitectónico que organiza el sistema en capas horizontales, donde cada capa solo puede comunicarse con la capa inmediatamente inferior.
+
+**¿Por qué usarla?**:
+- **Separación de responsabilidades**: Cada capa tiene un propósito específico
+- **Reutilización**: Capas inferiores pueden ser reutilizadas por múltiples capas superiores  
+- **Testabilidad**: Cada capa puede ser probada independientemente
+- **Mantenibilidad**: Cambios en una capa no afectan otras capas
+
+**Principios involucrados**:
+- **Single Responsibility**: Cada capa tiene una responsabilidad específica
+- **Dependency Rule**: Las dependencias apuntan hacia adentro (hacia el dominio)
+- **Abstraction**: Capas superiores no conocen detalles de implementación de capas inferiores
+
+#### Capas del Sistema Biblioteca Liskov:
+
+```python
+# 🎭 PRESENTATION LAYER (Capa de Presentación)
+# Responsabilidad: Interfaz de usuario y formateo de datos
+# Ubicación: src/presentation/
+class ConsoleUI:
+    def __init__(self, auth_service: AuthService, prestamo_service: PrestamoService):
+        # Depende SOLO de Application Layer
+        self.auth_service = auth_service
+        self.prestamo_service = prestamo_service
+    
+    def mostrar_menu_principal(self):
+        """Lógica de presentación - formateo y navegación"""
+        opciones = self._formatear_opciones()
+        seleccion = self._obtener_seleccion_usuario()
+        self._procesar_seleccion(seleccion)
+
+# 🧠 APPLICATION LAYER (Capa de Aplicación) 
+# Responsabilidad: Casos de uso y orquestación de dominio
+# Ubicación: src/application/
+class PrestamoService:
+    def __init__(self, prestamo_repo: PrestamoRepository):
+        # Depende SOLO de Domain Layer (interfaces)
+        self.prestamo_repo = prestamo_repo
+    
+    def realizar_prestamo(self, usuario_id: int, item_id: int) -> Prestamo:
+        """Caso de uso: coordina objetos de dominio"""
+        # Orquesta sin lógica de negocio - eso es responsabilidad del dominio
+
+# 💎 DOMAIN LAYER (Capa de Dominio)
+# Responsabilidad: Lógica de negocio y reglas empresariales  
+# Ubicación: src/domain/
+class Usuario:
+    def puede_realizar_prestamos(self) -> bool:
+        """Regla de negocio encapsulada en la entidad"""
+        return self.activo and not self.tiene_multas_pendientes()
+    
+    def obtener_limite_prestamos(self) -> int:
+        """Lógica de dominio basada en tipo de usuario"""
+        return self.tipo_usuario.limite_prestamos
+
+# 🔧 INFRASTRUCTURE LAYER (Capa de Infraestructura)
+# Responsabilidad: Detalles técnicos y acceso a recursos externos
+# Ubicación: src/infrastructure/
+class SQLiteUsuarioRepository:
+    def __init__(self, connection: sqlite3.Connection):
+        # Implementa interfaces definidas en Domain Layer
+        self.connection = connection
+    
+    def obtener_por_id(self, id: int) -> Optional[Usuario]:
+        """Detalle de implementación - SQL específico"""
+        # Conoce detalles de SQLite, mapeo de datos, etc.
+```
+
+#### Flujo de Dependencias (Dependency Rule):
+
+```
+🎭 Presentation Layer
+    ↓ (depende de)
+🧠 Application Layer  
+    ↓ (depende de)
+💎 Domain Layer
+    ↑ (implementa interfaces de)
+🔧 Infrastructure Layer
+```
+
+**Regla fundamental**: Las dependencias apuntan hacia adentro. El Domain Layer no conoce nada sobre capas exteriores.
+
+#### Beneficios Específicos en Biblioteca Liskov:
+
+1. **Presentation Independence**: 
+   - Podemos cambiar de Console UI a Web UI sin afectar lógica de negocio
+   - Diferentes formatos de salida (JSON, XML, HTML) sin cambios en Application Layer
+
+2. **Database Independence**: 
+   - Migrar de SQLite a PostgreSQL solo requiere nueva implementación de Repository
+   - Domain Layer permanece inalterado
+
+3. **Framework Independence**:
+   - No dependemos de frameworks específicos en el core del sistema
+   - Frameworks viven en Infrastructure Layer
+
+4. **Testability**:
+   - Domain Layer: Tests unitarios puros sin dependencias externas
+   - Application Layer: Tests con mocks de repositories
+   - Integration Tests: Solo en Infrastructure Layer
+
+#### Ejemplo de Violación vs Cumplimiento:
+
+```python
+# ❌ VIOLACIÓN - Domain Layer conociendo Infrastructure
+class Usuario:
+    def guardar_en_base(self):
+        # ¡MAL! Domain no debe conocer detalles de persistencia
+        connection = sqlite3.connect("biblioteca.db")
+        connection.execute("INSERT INTO usuarios...")
+
+# ✅ CORRECTO - Domain puro, Infrastructure separada  
+class Usuario:
+    def puede_realizar_prestamos(self) -> bool:
+        # ✓ BIEN - Solo lógica de negocio
+        return self.activo and not self.tiene_multas_pendientes()
+
+class SQLiteUsuarioRepository:
+    def crear(self, usuario: Usuario) -> Usuario:
+        # ✓ BIEN - Infrastructure maneja persistencia
+        connection = sqlite3.connect("biblioteca.db")
+        # ... implementación específica de SQLite
 ```
 
 ### 📐 Domain-Driven Design (DDD) Concepts
