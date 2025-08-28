@@ -70,14 +70,222 @@ graph TB
     R --> REPO
     REPO --> DB
     
-    style E fill:#e1f5fe
-    style R fill:#f3e5f5
-    style AS fill:#e8f5e8
-    style US fill:#e8f5e8
-    style IS fill:#e8f5e8
-    style PS fill:#e8f5e8
-    style RS fill:#e8f5e8
-    style MS fill:#e8f5e8
+    style E fill:#4a90e2,stroke:#2171b5,stroke-width:2px,color:#fff
+    style R fill:#7b68ee,stroke:#5a4fcf,stroke-width:2px,color:#fff
+    style AS fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style US fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style IS fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style PS fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style RS fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style MS fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style UI fill:#f0ad4e,stroke:#ec971f,stroke-width:2px,color:#fff
+    style API fill:#f0ad4e,stroke:#ec971f,stroke-width:2px,color:#fff
+    style DB fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
+    style REPO fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
+    style LOG fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
+    style V fill:#4a90e2,stroke:#2171b5,stroke-width:2px,color:#fff
+```
+
+## Arquitectura C4
+
+### Nivel 1: Contexto del Sistema
+
+```mermaid
+graph TB
+    subgraph "Biblioteca Universitaria"
+        SGB[Sistema de Gestión<br/>de Biblioteca]
+    end
+    
+    subgraph "Actores"
+        A[👨‍🎓 Alumno]
+        D[👨‍🏫 Docente]
+        E[👩‍💼 Empleado]
+    end
+    
+    subgraph "Sistemas Externos"
+        SE[📧 Sistema de<br/>Notificaciones]
+    end
+    
+    A -->|Consulta catálogo<br/>Realiza préstamos<br/>Gestiona reservas| SGB
+    D -->|Consulta catálogo<br/>Realiza préstamos<br/>Gestiona reservas| SGB
+    E -->|Administra usuarios<br/>Gestiona inventario<br/>Procesa multas| SGB
+    
+    SGB -->|Envía notificaciones<br/>de vencimientos| SE
+    
+    style SGB fill:#4a90e2,stroke:#2171b5,stroke-width:3px,color:#fff
+    style A fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style D fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style E fill:#f0ad4e,stroke:#ec971f,stroke-width:2px,color:#fff
+    style SE fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
+```
+
+### Nivel 2: Contenedores
+
+```mermaid
+graph TB
+    subgraph "Sistema de Gestión de Biblioteca"
+        subgraph "Aplicación"
+            UI[🖥️ Interfaz de Usuario<br/>Console Application<br/>Python]
+            API[🔌 API Layer<br/>Application Services<br/>Python]
+        end
+        
+        subgraph "Datos"
+            DB[(🗄️ Base de Datos<br/>SQLite<br/>Almacena usuarios,<br/>libros, préstamos)]
+        end
+        
+        subgraph "Logging"
+            LOG[📝 Sistema de Logs<br/>Python Logging<br/>Auditoria del sistema]
+        end
+    end
+    
+    subgraph "Usuarios"
+        U[👥 Usuarios del Sistema<br/>Alumnos, Docentes, Empleados]
+    end
+    
+    U -->|Interactúa con| UI
+    UI -->|Llama a| API
+    API -->|Lee/Escribe| DB
+    API -->|Registra eventos| LOG
+    
+    style UI fill:#f0ad4e,stroke:#ec971f,stroke-width:2px,color:#fff
+    style API fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style DB fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
+    style LOG fill:#7b68ee,stroke:#5a4fcf,stroke-width:2px,color:#fff
+    style U fill:#4a90e2,stroke:#2171b5,stroke-width:2px,color:#fff
+```
+
+### Nivel 3: Componentes
+
+```mermaid
+graph TB
+    subgraph "Presentation Layer"
+        UI[Console UI]
+        MU[Menu Utils]
+    end
+    
+    subgraph "Application Layer"
+        AS[Auth Service]
+        PS[Prestamo Service]
+        US[Usuario Service]
+        IS[Item Service]
+        RS[Reserva Service]
+        MS[Multa Service]
+    end
+    
+    subgraph "Domain Layer"
+        subgraph "Entities"
+            UE[Usuario]
+            IE[Item]
+            PE[Prestamo]
+            RE[Reserva]
+            ME[Multa]
+        end
+        
+        subgraph "Repository Interfaces"
+            URI[Usuario Repository<br/>Interface]
+            IRI[Item Repository<br/>Interface]
+            PRI[Prestamo Repository<br/>Interface]
+            RRI[Reserva Repository<br/>Interface]
+            MRI[Multa Repository<br/>Interface]
+        end
+    end
+    
+    subgraph "Infrastructure Layer"
+        subgraph "Repository Implementations"
+            UR[Usuario Repository]
+            IR[Item Repository]
+            PR[Prestamo Repository]
+            RR[Reserva Repository]
+            MR[Multa Repository]
+        end
+        
+        subgraph "Data Access"
+            DB[(SQLite Database)]
+            DBC[Database Connection]
+        end
+    end
+    
+    subgraph "Shared"
+        CFG[Configuration]
+        LOG[Logger]
+        EX[Exceptions]
+    end
+    
+    UI --> AS
+    UI --> PS
+    UI --> US
+    UI --> IS
+    UI --> RS
+    UI --> MS
+    UI --> MU
+    
+    AS --> UE
+    PS --> PE
+    US --> UE
+    IS --> IE
+    RS --> RE
+    MS --> ME
+    
+    AS --> URI
+    PS --> PRI
+    US --> URI
+    IS --> IRI
+    RS --> RRI
+    MS --> MRI
+    
+    URI --> UR
+    IRI --> IR
+    PRI --> PR
+    RRI --> RR
+    MRI --> MR
+    
+    UR --> DBC
+    IR --> DBC
+    PR --> DBC
+    RR --> DBC
+    MR --> DBC
+    
+    DBC --> DB
+    
+    AS --> LOG
+    PS --> LOG
+    US --> LOG
+    IS --> LOG
+    RS --> LOG
+    MS --> LOG
+    
+    AS --> CFG
+    PS --> CFG
+    US --> CFG
+    IS --> CFG
+    RS --> CFG
+    MS --> CFG
+    
+    style UE fill:#4a90e2,stroke:#2171b5,stroke-width:2px,color:#fff
+    style IE fill:#4a90e2,stroke:#2171b5,stroke-width:2px,color:#fff
+    style PE fill:#4a90e2,stroke:#2171b5,stroke-width:2px,color:#fff
+    style RE fill:#4a90e2,stroke:#2171b5,stroke-width:2px,color:#fff
+    style ME fill:#4a90e2,stroke:#2171b5,stroke-width:2px,color:#fff
+    style URI fill:#7b68ee,stroke:#5a4fcf,stroke-width:2px,color:#fff
+    style IRI fill:#7b68ee,stroke:#5a4fcf,stroke-width:2px,color:#fff
+    style PRI fill:#7b68ee,stroke:#5a4fcf,stroke-width:2px,color:#fff
+    style RRI fill:#7b68ee,stroke:#5a4fcf,stroke-width:2px,color:#fff
+    style MRI fill:#7b68ee,stroke:#5a4fcf,stroke-width:2px,color:#fff
+    style AS fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style PS fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style US fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style IS fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style RS fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style MS fill:#5cb85c,stroke:#449d44,stroke-width:2px,color:#fff
+    style UI fill:#f0ad4e,stroke:#ec971f,stroke-width:2px,color:#fff
+    style MU fill:#f0ad4e,stroke:#ec971f,stroke-width:2px,color:#fff
+    style DB fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
+    style DBC fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
+    style UR fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
+    style IR fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
+    style PR fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
+    style RR fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
+    style MR fill:#d9534f,stroke:#c9302c,stroke-width:2px,color:#fff
 ```
 
 ## Modelo de Datos
