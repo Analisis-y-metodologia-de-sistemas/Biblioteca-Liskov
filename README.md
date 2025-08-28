@@ -1,41 +1,205 @@
-# 📚 Biblioteca Liskov: Un Sistema de Gestión Bibliotecaria Inteligente
+# Sistema de Gestión Bibliotecaria - Biblioteca Liskov
 
-## 🎭 La Historia Detrás del Código
+## Descripción Técnica y Arquitectura
 
-> *"En una universidad donde el conocimiento fluye como ríos de sabiduría, existía un desafío ancestral: ¿cómo gestionar eficientemente miles de libros, cientos de usuarios y un sinfín de préstamos sin perder la cordura?"*
+Sistema de gestión bibliotecaria implementado siguiendo principios de **Clean Architecture** y patrones de diseño enterprise. El sistema demuestra la aplicación práctica de los principios SOLID, patrones de diseño GoF, y arquitectura hexagonal en un dominio de negocio real.
 
-Imagina a **María**, bibliotecaria de la Universidad Nacional, enfrentándose cada mañana a una montaña de tareas: estudiantes esperando libros, profesores necesitando recursos específicos, multas acumulándose, reservas perdidas en papeles amarillentos. Un caos organizado que clama por una solución elegante.
+## Patrones de Diseño y Principios Aplicados
 
-### 🚀 El Nacimiento de una Solución
+### 🏗️ Arquitectura Hexagonal (Ports & Adapters Pattern)
 
-Aquí nace **Biblioteca Liskov**, nombrada en honor a Barbara Liskov y su principio de sustitución que garantiza que cada componente del sistema sea intercambiable y confiable. Como los principios SOLID que guían su arquitectura, este sistema transforma el caos bibliotecario en una sinfonía digital perfectamente orquestada.
+**Implementación**: El sistema está estructurado en capas concéntricas donde el dominio es independiente de los detalles de infraestructura.
 
-### 🎯 La Misión
+**Componentes**:
+- **Puertos (Interfaces)**: `src/domain/repositories.py` - Define contratos de acceso a datos
+- **Adaptadores**: `src/infrastructure/repositories.py` - Implementaciones concretas
+- **Núcleo**: `src/domain/entities.py` - Lógica de negocio pura
 
-Biblioteca Liskov no es solo un sistema de gestión; es el puente entre el conocimiento y quienes lo buscan. Cada línea de código cuenta una historia:
+**Beneficio**: Permite intercambiar implementaciones (SQLite → PostgreSQL) sin afectar la lógica de negocio.
 
-- **👨‍🎓 Para Ana, la estudiante**: Que puede reservar ese libro imprescindible para su tesis sin hacer colas interminables
-- **👨‍🏫 Para Dr. Pérez, el profesor**: Quien necesita acceso prioritario a recursos académicos para sus investigaciones
-- **👩‍💼 Para María, la bibliotecaria**: Que finalmente puede administrar todo desde una interfaz intuitiva y confiable
+### 🎯 Principios SOLID
 
-### 🏗️ La Arquitectura de los Sueños
+#### S - Single Responsibility Principle
+- **AuthService** (`src/application/auth_service.py`): Solo maneja autenticación
+- **PrestamoService** (`src/application/services.py`): Solo gestiona préstamos
+- **Cada Entity**: Una responsabilidad de negocio específica
 
-Como una catedral gótica, donde cada arco sostiene el conjunto sin comprometer la belleza, Biblioteca Liskov utiliza **Arquitectura Hexagonal**. No es solo código; es filosofía aplicada:
+#### O - Open/Closed Principle
+- **Repository Interfaces**: Abiertas para extensión via herencia
+- **Service Layer**: Nuevos servicios sin modificar existentes
+- **Entity Validation**: Extensible via decoradores
 
+#### L - Liskov Substitution Principle
+- **Repository Implementations**: Intercambiables sin afectar comportamiento
+- **Service Interfaces**: Cualquier implementación mantiene el contrato
+- **Entity Hierarchies**: Subclases mantienen invariantes del padre
+
+#### I - Interface Segregation Principle
+- **Repositories específicos**: `UsuarioRepository`, `ItemRepository`, etc.
+- **Service Interfaces**: Separadas por dominio de responsabilidad
+- **No fat interfaces**: Cada interfaz define solo lo necesario
+
+#### D - Dependency Inversion Principle
+- **Services dependen de abstracciones**: `AuthService(usuario_repo: UsuarioRepository)`
+- **Infrastructure depende de Domain**: Repository implementa interface del dominio
+- **Injection via Constructor**: Dependencias inyectadas, no instanciadas
+
+### 🏭 Patrones de Diseño GoF
+
+#### Repository Pattern
+```python
+# Interface (Puerto)
+class UsuarioRepository(ABC):
+    @abstractmethod
+    def obtener_por_email(self, email: str) -> Optional[Usuario]:
+        pass
+
+# Implementación (Adaptador)
+class SQLiteUsuarioRepository(UsuarioRepository):
+    def obtener_por_email(self, email: str) -> Optional[Usuario]:
+        # Implementación específica SQLite
 ```
-🎭 Presentation Layer  → La cara amable del sistema
-🧠 Application Layer   → El cerebro que toma decisiones  
-💎 Domain Layer        → El corazón donde vive la lógica de negocio
-🔧 Infrastructure Layer → Los cimientos sólidos que sostienen todo
+
+**Ubicación**: `src/domain/repositories.py` (interfaces), `src/infrastructure/repositories.py` (implementaciones)
+**Propósito**: Abstrae el acceso a datos del dominio de negocio
+
+#### Service Layer Pattern
+```python
+class PrestamoService:
+    def __init__(self, prestamo_repo: PrestamoRepository, 
+                 item_repo: ItemRepository, 
+                 usuario_repo: UsuarioRepository):
+        # Inyección de dependencias
 ```
 
-### 🌟 El Resultado
+**Ubicación**: `src/application/services.py`
+**Propósito**: Orquesta operaciones de dominio y mantiene transaccionalidad
 
-Un sistema que no solo funciona, sino que **inspira confianza**. Donde cada préstamo se registra con precisión, cada multa se calcula justamente, y cada reserva se procesa con la eficiencia de un reloj suizo.
+#### Domain Model Pattern
+```python
+class Usuario:
+    def puede_realizar_prestamos(self) -> bool:
+        return self.activo and len(self.multas_pendientes) == 0
+    
+    def obtener_limite_prestamos(self) -> int:
+        return self.tipo_usuario.limite_prestamos
+```
 
-**Biblioteca Liskov**: *Donde la tecnología encuentra el propósito, y el código sirve a la humanidad.*
+**Ubicación**: `src/domain/entities.py`
+**Propósito**: Encapsula lógica de negocio en las entidades
 
----
+#### Factory Pattern
+```python
+# En container.py - Service Locator/Factory hybrid
+class Container:
+    def get_auth_service(self) -> AuthService:
+        return AuthService(self.get_usuario_repository())
+```
+
+**Ubicación**: `src/container.py`
+**Propósito**: Centraliza creación y configuración de objetos
+
+#### Command Pattern (Implícito)
+```python
+class PrestamoService:
+    def realizar_prestamo(self, usuario_id: int, item_id: int) -> Prestamo:
+        # Comando que encapsula toda la operación
+```
+
+**Ubicación**: Métodos de servicios en `src/application/services.py`
+**Propósito**: Encapsula operaciones complejas como comandos ejecutables
+
+### 🔧 Patrones Arquitectónicos Adicionales
+
+#### Dependency Injection Container
+**Implementación**: `src/container.py`
+```python
+class Container:
+    def __init__(self):
+        self._database = DatabaseConnection()
+    
+    def get_prestamo_service(self) -> PrestamoService:
+        return PrestamoService(
+            self.get_prestamo_repository(),
+            self.get_item_repository(), 
+            self.get_usuario_repository()
+        )
+```
+
+#### Data Transfer Object (DTO) Pattern
+**Uso implícito**: Las entidades actúan como DTOs entre capas
+**Beneficio**: Datos estructurados sin lógica de persistencia
+
+#### Unit of Work Pattern (Simplificado)
+**Implementación**: Transacciones a nivel de servicio
+```python
+def realizar_prestamo(self, usuario_id: int, item_id: int) -> Prestamo:
+    # Operación atómica - todo éxito o todo falla
+    prestamo = self.prestamo_repo.crear(...)
+    self.item_repo.reducir_disponibilidad(item_id)
+    return prestamo
+```
+
+### 📐 Domain-Driven Design (DDD) Concepts
+
+#### Entities vs Value Objects
+- **Entities**: `Usuario`, `Item`, `Prestamo` (tienen identidad)
+- **Value Objects**: `TipoUsuario`, `EstadoPrestamo` (definidos por valor)
+
+#### Aggregate Roots
+- **Usuario**: Agrega sus préstamos, reservas y multas
+- **Item**: Agrega su disponibilidad y reservas
+- **Prestamo**: Agrega sus multas asociadas
+
+#### Domain Services
+```python
+class MultaService:
+    def generar_multas_por_retraso(self):
+        # Lógica de dominio que no pertenece a una entidad específica
+```
+
+### 🔒 Principios de Seguridad y Robustez
+
+#### Fail-Fast Principle
+```python
+def realizar_prestamo(self, usuario_id: int, item_id: int) -> Prestamo:
+    usuario = self.usuario_repo.obtener_por_id(usuario_id)
+    if not usuario:
+        raise UsuarioNoEncontradoError(f"Usuario {usuario_id} no existe")
+```
+
+#### Exception Handling Strategy
+**Ubicación**: `src/shared/exceptions.py`
+```python
+class BibliotecaBaseException(Exception):
+    """Base exception para errores del dominio"""
+
+class UsuarioNoEncontradoError(BibliotecaBaseException):
+    """Usuario específico no encontrado"""
+```
+
+#### Logging Strategy
+**Implementación**: `src/shared/logger.py`
+- **Audit Trail**: Todas las operaciones críticas se registran
+- **Error Tracking**: Excepciones capturadas y loggeadas
+- **Performance Monitoring**: Tiempos de operación registrados
+
+## Ventajas de la Implementación
+
+### ✅ Mantenibilidad
+- **Bajo acoplamiento**: Cambios en UI no afectan lógica de negocio
+- **Alta cohesión**: Cada componente tiene responsabilidad clara
+- **Testabilidad**: Dependencias mockeable via interfaces
+
+### ✅ Extensibilidad  
+- **Nuevos adaptadores**: Fácil agregar REST API, GraphQL
+- **Nuevas reglas de negocio**: Extensibles via herencia o composición
+- **Nuevos tipos de usuario**: Polimorfismo via enum/inheritance
+
+### ✅ Robustez
+- **Validación en capas**: Domain, Application y Presentation
+- **Transaccionalidad**: Operaciones atómicas a nivel servicio
+- **Error handling**: Estrategia consistente de manejo de errores
 
 ## 🛠️ Características Principales
 
