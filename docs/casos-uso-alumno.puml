@@ -1,0 +1,90 @@
+@startuml Casos de Uso - Alumno
+!define RECTANGLE class
+!theme plain
+
+title "Casos de Uso - Alumno\nSistema de Gestión de Biblioteca Liskov"
+
+left to right direction
+
+actor "Alumno" as Alumno #lightblue
+
+package "Sistema de Biblioteca" {
+    
+    package "Gestión de Perfil" #lightgreen {
+        usecase "Consultar información personal" as UC1
+        usecase "Actualizar datos de contacto" as UC2
+    }
+    
+    package "Búsqueda y Consulta" #lightyellow {
+        usecase "Buscar libros por título" as UC3
+        usecase "Buscar libros por autor" as UC4
+        usecase "Buscar por categoría" as UC5
+        usecase "Consultar disponibilidad de items" as UC6
+        usecase "Ver catálogo completo" as UC7
+    }
+    
+    package "Préstamos" #lightcyan {
+        usecase "Solicitar préstamo" as UC8
+        usecase "Consultar historial de préstamos" as UC9
+        usecase "Consultar fechas de devolución" as UC10
+        usecase "Renovar préstamo" as UC11
+    }
+    
+    package "Reservas" #lavender {
+        usecase "Realizar reserva" as UC12
+        usecase "Consultar estado de reservas" as UC13
+        usecase "Cancelar reserva" as UC14
+    }
+    
+    package "Multas y Pagos" #mistyrose {
+        usecase "Consultar multas pendientes" as UC15
+        usecase "Ver detalle de multas" as UC16
+        usecase "Consultar historial de pagos" as UC17
+    }
+}
+
+' Relaciones del Alumno
+Alumno --> UC1
+Alumno --> UC2
+
+Alumno --> UC3
+Alumno --> UC4
+Alumno --> UC5
+Alumno --> UC6
+Alumno --> UC7
+
+Alumno --> UC8
+Alumno --> UC9
+Alumno --> UC10
+Alumno --> UC11
+
+Alumno --> UC12
+Alumno --> UC13
+Alumno --> UC14
+
+Alumno --> UC15
+Alumno --> UC16
+Alumno --> UC17
+
+' Relaciones entre casos de uso (includes y extends)
+UC8 ..> UC6 : <<include>>
+UC12 ..> UC6 : <<include>>
+UC11 ..> UC10 : <<extend>>
+
+' Notas explicativas
+note right of UC8
+  Requiere item disponible
+  y usuario sin multas pendientes
+end note
+
+note right of UC12
+  Solo para items no disponibles
+  Máximo 3 días de vigencia
+end note
+
+note right of UC15
+  Automático por devolución tardía
+  $50 por día de atraso
+end note
+
+@enduml

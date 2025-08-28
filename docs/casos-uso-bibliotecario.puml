@@ -1,0 +1,176 @@
+@startuml Casos de Uso - Bibliotecario (Empleado del Sistema)
+!define RECTANGLE class
+!theme plain
+
+title "Casos de Uso - Bibliotecario (Empleado)\nSistema de Gestión de Biblioteca Liskov"
+
+left to right direction
+
+actor "Bibliotecario\n(Empleado)" as Bibliotecario #lightpink
+
+package "Sistema de Biblioteca" {
+    
+    package "Autenticación y Sesión" #lightgray {
+        usecase "Iniciar sesión en el sistema" as UC1
+        usecase "Cerrar sesión" as UC2
+        usecase "Cambiar contraseña" as UC3
+    }
+    
+    package "Gestión de Usuarios" #lightgreen {
+        usecase "Registrar nuevo usuario" as UC4
+        usecase "Buscar usuario por email" as UC5
+        usecase "Actualizar datos de usuario" as UC6
+        usecase "Listar todos los usuarios" as UC7
+        usecase "Desactivar usuario" as UC8
+    }
+    
+    package "Gestión de Items" #lightyellow {
+        usecase "Agregar nuevo item" as UC9
+        usecase "Buscar items por título" as UC10
+        usecase "Buscar items por autor" as UC11
+        usecase "Actualizar información de item" as UC12
+        usecase "Cambiar estado de item" as UC13
+        usecase "Listar items por categoría" as UC14
+        usecase "Eliminar item del catálogo" as UC15
+    }
+    
+    package "Gestión de Préstamos" #lightcyan {
+        usecase "Procesar préstamo" as UC16
+        usecase "Registrar devolución" as UC17
+        usecase "Listar préstamos activos" as UC18
+        usecase "Consultar historial de préstamos" as UC19
+        usecase "Renovar préstamo" as UC20
+        usecase "Generar multa por atraso" as UC21
+    }
+    
+    package "Gestión de Reservas" #lavender {
+        usecase "Procesar reserva" as UC22
+        usecase "Cancelar reserva" as UC23
+        usecase "Listar reservas activas" as UC24
+        usecase "Notificar disponibilidad" as UC25
+        usecase "Convertir reserva en préstamo" as UC26
+    }
+    
+    package "Gestión de Multas" #mistyrose {
+        usecase "Registrar pago de multa" as UC27
+        usecase "Consultar multas pendientes" as UC28
+        usecase "Generar reporte de multas" as UC29
+        usecase "Exonerar multa" as UC30
+    }
+    
+    package "Reportes y Estadísticas" #lightsteelblue {
+        usecase "Generar reporte de préstamos" as UC31
+        usecase "Estadísticas de uso por categoría" as UC32
+        usecase "Reporte de items más solicitados" as UC33
+        usecase "Reporte de usuarios activos" as UC34
+        usecase "Auditoría de operaciones" as UC35
+    }
+    
+    package "Gestión de Empleados" #wheat {
+        usecase "Crear nuevo empleado" as UC36
+        usecase "Listar empleados activos" as UC37
+        usecase "Desactivar empleado" as UC38
+    }
+}
+
+' Relaciones del Bibliotecario
+' Autenticación
+Bibliotecario --> UC1
+Bibliotecario --> UC2
+Bibliotecario --> UC3
+
+' Gestión de Usuarios
+Bibliotecario --> UC4
+Bibliotecario --> UC5
+Bibliotecario --> UC6
+Bibliotecario --> UC7
+Bibliotecario --> UC8
+
+' Gestión de Items
+Bibliotecario --> UC9
+Bibliotecario --> UC10
+Bibliotecario --> UC11
+Bibliotecario --> UC12
+Bibliotecario --> UC13
+Bibliotecario --> UC14
+Bibliotecario --> UC15
+
+' Gestión de Préstamos
+Bibliotecario --> UC16
+Bibliotecario --> UC17
+Bibliotecario --> UC18
+Bibliotecario --> UC19
+Bibliotecario --> UC20
+Bibliotecario --> UC21
+
+' Gestión de Reservas
+Bibliotecario --> UC22
+Bibliotecario --> UC23
+Bibliotecario --> UC24
+Bibliotecario --> UC25
+Bibliotecario --> UC26
+
+' Gestión de Multas
+Bibliotecario --> UC27
+Bibliotecario --> UC28
+Bibliotecario --> UC29
+Bibliotecario --> UC30
+
+' Reportes
+Bibliotecario --> UC31
+Bibliotecario --> UC32
+Bibliotecario --> UC33
+Bibliotecario --> UC34
+Bibliotecario --> UC35
+
+' Gestión de Empleados (solo jefe)
+Bibliotecario --> UC36
+Bibliotecario --> UC37
+Bibliotecario --> UC38
+
+' Relaciones entre casos de uso (includes y extends)
+UC16 ..> UC5 : <<include>>
+UC16 ..> UC10 : <<include>>
+UC17 ..> UC18 : <<include>>
+UC21 ..> UC17 : <<extend>>
+UC22 ..> UC5 : <<include>>
+UC22 ..> UC10 : <<include>>
+UC26 ..> UC22 : <<extend>>
+UC30 ..> UC28 : <<extend>>
+
+' Especializaciones por cargo
+UC36 --|> UC36 : <<restrict>>\nSolo Bibliotecario Jefe
+UC38 --|> UC38 : <<restrict>>\nSolo Bibliotecario Jefe
+
+' Notas explicativas
+note right of UC1
+  Selección de empleado activo
+  Autenticación con contraseña
+  Registro de sesión y auditoría
+end note
+
+note right of UC16
+  Validación de disponibilidad
+  Registro de trazabilidad
+  Cambio automático de estado
+end note
+
+note right of UC21
+  Automático si devolución tardía
+  $50 por día de atraso
+  Registro del empleado responsable
+end note
+
+note right of UC35
+  Todas las operaciones registran
+  qué empleado las ejecutó
+  Logs con timestamp y detalles
+end note
+
+note bottom of UC36
+  Solo empleados con cargo
+  "Bibliotecario Jefe" pueden
+  gestionar otros empleados
+end note
+
+@enduml

@@ -1,0 +1,144 @@
+@startuml
+!theme plain
+title Sistema de Gestión de Biblioteca Liskov - Casos de Uso
+
+left to right direction
+
+actor "Usuario Alumno" as Alumno
+actor "Usuario Docente" as Docente  
+actor "Bibliotecario" as Bibliotecario
+actor "Sistema" as Sistema
+
+rectangle "Sistema de Biblioteca Liskov" {
+  
+  package "Gestión de Usuarios" {
+    usecase "Registrar Usuario" as UC01
+    usecase "Buscar Usuario" as UC02
+    usecase "Listar Usuarios" as UC03
+    usecase "Actualizar Perfil" as UC04
+  }
+  
+  package "Gestión de Items" {
+    usecase "Agregar Item" as UC05
+    usecase "Buscar Item por Título" as UC06
+    usecase "Buscar Item por Autor" as UC07
+    usecase "Listar Items Disponibles" as UC08
+    usecase "Actualizar Estado Item" as UC09
+    usecase "Listar por Categoría" as UC10
+  }
+  
+  package "Gestión de Préstamos" {
+    usecase "Realizar Préstamo" as UC11
+    usecase "Devolver Item" as UC12
+    usecase "Listar Préstamos Activos" as UC13
+    usecase "Ver Historial Préstamos" as UC14
+    usecase "Verificar Disponibilidad" as UC15
+  }
+  
+  package "Gestión de Reservas" {
+    usecase "Realizar Reserva" as UC16
+    usecase "Cancelar Reserva" as UC17
+    usecase "Listar Reservas Activas" as UC18
+    usecase "Notificar Disponibilidad" as UC19
+  }
+  
+  package "Gestión de Multas" {
+    usecase "Generar Multa Automática" as UC20
+    usecase "Pagar Multa" as UC21
+    usecase "Listar Multas Pendientes" as UC22
+    usecase "Ver Historial Multas" as UC23
+  }
+  
+  package "Reportes y Consultas" {
+    usecase "Generar Reporte Usuarios" as UC24
+    usecase "Generar Reporte Items" as UC25
+    usecase "Generar Reporte Préstamos" as UC26
+    usecase "Estadísticas Sistema" as UC27
+  }
+  
+  package "Sistema de Menús Interactivos" {
+    usecase "Navegar Menús Desplegables" as UC28
+    usecase "Seleccionar con Teclas" as UC29
+    usecase "Confirmar Acciones" as UC30
+    usecase "Mostrar Mensajes Contextuales" as UC31
+  }
+}
+
+' Relaciones Bibliotecario
+Bibliotecario --> UC01 : registra
+Bibliotecario --> UC02 : busca
+Bibliotecario --> UC03 : lista
+Bibliotecario --> UC05 : agrega
+Bibliotecario --> UC06 : busca
+Bibliotecario --> UC07 : busca
+Bibliotecario --> UC08 : consulta
+Bibliotecario --> UC09 : actualiza
+Bibliotecario --> UC10 : lista
+Bibliotecario --> UC11 : realiza
+Bibliotecario --> UC12 : procesa
+Bibliotecario --> UC13 : consulta
+Bibliotecario --> UC14 : consulta
+Bibliotecario --> UC16 : gestiona
+Bibliotecario --> UC17 : cancela
+Bibliotecario --> UC18 : consulta
+Bibliotecario --> UC21 : registra pago
+Bibliotecario --> UC22 : consulta
+Bibliotecario --> UC24 : genera
+Bibliotecario --> UC25 : genera
+Bibliotecario --> UC26 : genera
+Bibliotecario --> UC27 : consulta
+
+' Relaciones Usuario Alumno
+Alumno --> UC06 : consulta
+Alumno --> UC07 : consulta
+Alumno --> UC08 : consulta
+Alumno --> UC10 : consulta
+Alumno --> UC14 : consulta propio
+Alumno --> UC16 : solicita
+Alumno --> UC17 : cancela propia
+Alumno --> UC23 : consulta propias
+
+' Relaciones Usuario Docente  
+Docente --> UC06 : consulta
+Docente --> UC07 : consulta
+Docente --> UC08 : consulta
+Docente --> UC10 : consulta
+Docente --> UC14 : consulta propio
+Docente --> UC16 : solicita
+Docente --> UC17 : cancela propia
+Docente --> UC23 : consulta propias
+
+' Relaciones Sistema Automático
+Sistema --> UC15 : verifica automáticamente
+Sistema --> UC19 : envía notificación
+Sistema --> UC20 : genera por retraso
+
+' Todos los usuarios usan menús interactivos
+Alumno --> UC28 : usa
+Alumno --> UC29 : navega
+Alumno --> UC30 : confirma
+Alumno --> UC31 : recibe
+
+Docente --> UC28 : usa
+Docente --> UC29 : navega
+Docente --> UC30 : confirma
+Docente --> UC31 : recibe
+
+Bibliotecario --> UC28 : usa
+Bibliotecario --> UC29 : navega
+Bibliotecario --> UC30 : confirma
+Bibliotecario --> UC31 : recibe
+
+' Extensiones y dependencias
+UC11 ..> UC15 : <<include>>
+UC16 ..> UC15 : <<include>>
+UC12 ..> UC20 : <<extend>>\nsi hay retraso
+UC04 ..> UC02 : <<include>>
+
+' Notas explicativas
+note right of UC11 : Verifica disponibilidad\ny permisos del usuario
+note right of UC20 : Se ejecuta automáticamente\nal detectar retraso
+note right of UC28 : Interfaz con navegación\ncon teclas ↑↓ y ENTER
+note bottom of UC15 : Verificación en tiempo real\ndel estado del item
+
+@enduml

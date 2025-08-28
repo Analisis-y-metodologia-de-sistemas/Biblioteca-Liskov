@@ -1,0 +1,62 @@
+erDiagram
+    USUARIOS {
+        int id PK
+        string nombre
+        string apellido
+        string email UK
+        string tipo
+        string numero_identificacion UK
+        string telefono
+        boolean activo
+        timestamp fecha_registro
+    }
+    
+    ITEMS_BIBLIOTECA {
+        int id PK
+        string titulo
+        string autor
+        string isbn
+        string categoria
+        string estado
+        string descripcion
+        string ubicacion
+        timestamp fecha_adquisicion
+        real valor_reposicion
+    }
+    
+    PRESTAMOS {
+        int id PK
+        int usuario_id FK
+        int item_id FK
+        timestamp fecha_prestamo
+        timestamp fecha_devolucion_esperada
+        timestamp fecha_devolucion_real
+        string observaciones
+        boolean activo
+    }
+    
+    RESERVAS {
+        int id PK
+        int usuario_id FK
+        int item_id FK
+        timestamp fecha_reserva
+        timestamp fecha_expiracion
+        boolean activa
+    }
+    
+    MULTAS {
+        int id PK
+        int usuario_id FK
+        int prestamo_id FK
+        real monto
+        string descripcion
+        timestamp fecha_multa
+        boolean pagada
+    }
+    
+    USUARIOS ||--o{ PRESTAMOS : "realiza"
+    ITEMS_BIBLIOTECA ||--o{ PRESTAMOS : "es_prestado"
+    USUARIOS ||--o{ RESERVAS : "hace"
+    ITEMS_BIBLIOTECA ||--o{ RESERVAS : "es_reservado"
+    USUARIOS ||--o{ MULTAS : "recibe"
+    PRESTAMOS ||--o{ MULTAS : "genera"

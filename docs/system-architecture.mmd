@@ -1,0 +1,95 @@
+graph TB
+    subgraph "PRESENTACIÓN"
+        UI[ConsoleUI]
+        Menu[MenuUtils]
+    end
+    
+    subgraph "APLICACIÓN"
+        US[UsuarioService]
+        IS[ItemBibliotecaService]
+        PS[PrestamoService]
+        RS[ReservaService]
+        MS[MultaService]
+        IUR[IUsuarioRepository]
+        IIR[IItemBibliotecaRepository]
+        IPR[IPrestamoRepository]
+        IRR[IReservaRepository]
+        IMR[IMultaRepository]
+    end
+    
+    subgraph "DOMINIO"
+        User[Usuario]
+        Item[ItemBiblioteca]
+        Loan[Prestamo]
+        Reserve[Reserva]
+        Fine[Multa]
+        TipoUser[TipoUsuario]
+        EstadoItem[EstadoItem]
+        CategoriaItem[CategoriaItem]
+    end
+    
+    subgraph "INFRAESTRUCTURA"
+        SQLUser[SQLiteUsuarioRepository]
+        SQLItem[SQLiteItemRepository]
+        SQLLoan[SQLitePrestamoRepository]
+        SQLReserve[SQLiteReservaRepository]
+        SQLFine[SQLiteMultaRepository]
+        ORM[ORM]
+        DB[DatabaseConnection]
+    end
+    
+    subgraph "SHARED"
+        Log[Logger]
+        Conf[Config]
+        Exc[Exceptions]
+    end
+    
+    subgraph "BASE DE DATOS"
+        SQLite[(SQLite DB)]
+    end
+    
+    %% Conexiones Presentación
+    UI --> US
+    UI --> IS
+    UI --> PS
+    UI --> RS
+    UI --> MS
+    UI --> Menu
+    UI --> Log
+    
+    %% Conexiones Aplicación
+    US --> IUR
+    IS --> IIR
+    PS --> IPR
+    PS --> IUR
+    PS --> IIR
+    PS --> IMR
+    RS --> IRR
+    RS --> IUR
+    RS --> IIR
+    MS --> IMR
+    MS --> IUR
+    
+    %% Implementaciones
+    SQLUser -.-> IUR
+    SQLItem -.-> IIR
+    SQLLoan -.-> IPR
+    SQLReserve -.-> IRR
+    SQLFine -.-> IMR
+    
+    %% Conexiones Infraestructura
+    SQLUser --> ORM
+    SQLItem --> ORM
+    SQLLoan --> ORM
+    SQLReserve --> ORM
+    SQLFine --> ORM
+    ORM --> DB
+    DB --> SQLite
+    
+    %% Relaciones Dominio
+    User -.-> Loan
+    Item -.-> Loan
+    User -.-> Reserve
+    Item -.-> Reserve
+    User -.-> Fine
+    Loan -.-> Fine

@@ -1,0 +1,125 @@
+classDiagram
+    %% ENTIDADES DE DOMINIO
+    class Usuario {
+        +int id
+        +string nombre
+        +string apellido
+        +string email
+        +TipoUsuario tipo
+        +string numero_identificacion
+        +bool activo
+    }
+    
+    class ItemBiblioteca {
+        +int id
+        +string titulo
+        +string autor
+        +CategoriaItem categoria
+        +EstadoItem estado
+        +string ubicacion
+    }
+    
+    class Prestamo {
+        +int id
+        +int usuario_id
+        +int item_id
+        +datetime fecha_prestamo
+        +datetime fecha_devolucion_esperada
+        +bool activo
+    }
+    
+    class Reserva {
+        +int id
+        +int usuario_id
+        +int item_id
+        +datetime fecha_reserva
+        +bool activa
+    }
+    
+    class Multa {
+        +int id
+        +int usuario_id
+        +int prestamo_id
+        +float monto
+        +bool pagada
+    }
+    
+    %% SERVICIOS DE APLICACIÓN
+    class UsuarioService {
+        +registrar_usuario() Usuario
+        +buscar_usuario_por_email() Usuario
+        +listar_usuarios() List~Usuario~
+    }
+    
+    class ItemBibliotecaService {
+        +agregar_item() ItemBiblioteca
+        +buscar_por_titulo() List~ItemBiblioteca~
+        +listar_disponibles() List~ItemBiblioteca~
+    }
+    
+    class PrestamoService {
+        +realizar_prestamo() Prestamo
+        +devolver_item() Prestamo
+        +listar_prestamos_activos() List~Prestamo~
+    }
+    
+    %% REPOSITORIOS
+    class IUsuarioRepository {
+        <<interface>>
+        +crear() Usuario
+        +obtener_por_id() Usuario
+        +listar_todos() List~Usuario~
+    }
+    
+    class IItemBibliotecaRepository {
+        <<interface>>
+        +crear() ItemBiblioteca
+        +obtener_por_id() ItemBiblioteca
+        +buscar_por_titulo() List~ItemBiblioteca~
+    }
+    
+    %% INFRAESTRUCTURA
+    class DatabaseConnection {
+        +get_connection() Connection
+        +execute_query() List~Dict~
+    }
+    
+    class ORM {
+        +create_tables() void
+        +insert() int
+        +select() List~Dict~
+    }
+    
+    %% PRESENTACIÓN
+    class ConsoleUI {
+        +ejecutar() void
+        +mostrar_menu_principal() void
+        +registrar_usuario() void
+        +realizar_prestamo() void
+    }
+    
+    class MenuUtils {
+        +select_from_list() Any
+        +show_dropdown_menu() MenuItem
+        +confirm_action() bool
+    }
+    
+    %% RELACIONES
+    Usuario ||--o{ Prestamo
+    ItemBiblioteca ||--o{ Prestamo
+    Usuario ||--o{ Reserva
+    ItemBiblioteca ||--o{ Reserva
+    Usuario ||--o{ Multa
+    Prestamo ||--o{ Multa
+    
+    UsuarioService --> IUsuarioRepository
+    ItemBibliotecaService --> IItemBibliotecaRepository
+    PrestamoService --> IUsuarioRepository
+    PrestamoService --> IItemBibliotecaRepository
+    
+    ConsoleUI --> UsuarioService
+    ConsoleUI --> ItemBibliotecaService  
+    ConsoleUI --> PrestamoService
+    ConsoleUI --> MenuUtils
+    
+    ORM --> DatabaseConnection

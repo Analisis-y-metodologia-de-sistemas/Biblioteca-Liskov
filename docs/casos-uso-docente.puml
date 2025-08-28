@@ -1,0 +1,122 @@
+@startuml Casos de Uso - Docente
+!define RECTANGLE class
+!theme plain
+
+title "Casos de Uso - Docente\nSistema de Gestión de Biblioteca Liskov"
+
+left to right direction
+
+actor "Docente" as Docente #lightcoral
+
+package "Sistema de Biblioteca" {
+    
+    package "Gestión de Perfil" #lightgreen {
+        usecase "Consultar información personal" as UC1
+        usecase "Actualizar datos de contacto" as UC2
+    }
+    
+    package "Búsqueda Avanzada" #lightyellow {
+        usecase "Buscar material didáctico" as UC3
+        usecase "Buscar por área temática" as UC4
+        usecase "Buscar bibliografía especializada" as UC5
+        usecase "Consultar disponibilidad de items" as UC6
+        usecase "Buscar recursos multimedia" as UC7
+        usecase "Consultar revistas académicas" as UC8
+    }
+    
+    package "Préstamos Extendidos" #lightcyan {
+        usecase "Solicitar préstamo de larga duración" as UC9
+        usecase "Renovar múltiples veces" as UC10
+        usecase "Consultar historial de préstamos" as UC11
+        usecase "Solicitar préstamo domiciliario" as UC12
+        usecase "Consultar fechas de devolución" as UC13
+    }
+    
+    package "Reservas Prioritarias" #lavender {
+        usecase "Realizar reserva prioritaria" as UC14
+        usecase "Reservar material para clase" as UC15
+        usecase "Consultar estado de reservas" as UC16
+        usecase "Cancelar reserva" as UC17
+    }
+    
+    package "Servicios Especiales" #lightsteelblue {
+        usecase "Solicitar bibliografía para curso" as UC18
+        usecase "Acceso a colección docente" as UC19
+        usecase "Solicitar adquisición de material" as UC20
+        usecase "Consultar estadísticas de uso" as UC21
+    }
+    
+    package "Multas y Gestión" #mistyrose {
+        usecase "Consultar multas pendientes" as UC22
+        usecase "Ver detalle de multas" as UC23
+        usecase "Solicitar exención de multas" as UC24
+    }
+}
+
+' Relaciones del Docente
+Docente --> UC1
+Docente --> UC2
+
+Docente --> UC3
+Docente --> UC4
+Docente --> UC5
+Docente --> UC6
+Docente --> UC7
+Docente --> UC8
+
+Docente --> UC9
+Docente --> UC10
+Docente --> UC11
+Docente --> UC12
+Docente --> UC13
+
+Docente --> UC14
+Docente --> UC15
+Docente --> UC16
+Docente --> UC17
+
+Docente --> UC18
+Docente --> UC19
+Docente --> UC20
+Docente --> UC21
+
+Docente --> UC22
+Docente --> UC23
+Docente --> UC24
+
+' Relaciones entre casos de uso (includes y extends)
+UC9 ..> UC6 : <<include>>
+UC14 ..> UC6 : <<include>>
+UC10 ..> UC9 : <<extend>>
+UC15 ..> UC14 : <<extend>>
+UC24 ..> UC22 : <<extend>>
+
+' Especializaciones
+UC9 --|> UC9 : <<extend>>\n30 días vs 15 días
+UC14 --|> UC14 : <<extend>>\nPrioridad alta
+
+' Notas explicativas
+note right of UC9
+  Docentes: hasta 30 días
+  Renovaciones: hasta 3 veces
+  Sin límite de items simultáneos
+end note
+
+note right of UC14
+  Reservas prioritarias
+  Vigencia: 7 días
+  Notificación automática
+end note
+
+note right of UC19
+  Material especializado
+  Acceso exclusivo docentes
+  Préstamos de semestre
+end note
+
+note right of UC24
+  Previa justificación académica
+  Aprobación bibliotecario jefe
+end note
+
+@enduml
