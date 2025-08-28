@@ -319,19 +319,70 @@ El Sistema de Gestión de Biblioteca Liskov está diseñado para atender las nec
 
 ## Diagramas de Casos de Uso
 
-Los diagramas visuales de casos de uso están disponibles en:
+### 🎯 Vista General del Sistema
 
-### 🖼️ **Diagramas Generales**
-- **[Casos de Uso Generales](casos-de-uso.png)**: Vista completa del sistema
-- **[Casos de Uso - Alumno](Casos de Uso - Alumno.png)**: Funcionalidades para alumnos
-- **[Casos de Uso - Docente](Casos de Uso - Docente.png)**: Funcionalidades para docentes  
-- **[Casos de Uso - Bibliotecario](Casos de Uso - Bibliotecario (Empleado del Sistema).png)**: Funcionalidades administrativas
+El siguiente diagrama muestra una vista completa de todos los casos de uso del sistema, organizados por paquetes funcionales y mostrando las relaciones entre los diferentes actores (Alumno, Docente, Bibliotecario y Sistema). Este diagrama presenta la arquitectura funcional completa del Sistema de Biblioteca Liskov, incluyendo las dependencias y extensiones entre casos de uso.
 
-### 📄 **Código Fuente PlantUML**
-- **[casos-de-uso.puml](casos-de-uso.puml)**: Diagrama general completo
-- **[casos-uso-alumno.puml](casos-uso-alumno.puml)**: Casos de uso específicos para alumnos
-- **[casos-uso-docente.puml](casos-uso-docente.puml)**: Casos de uso específicos para docentes
-- **[casos-uso-bibliotecario.puml](casos-uso-bibliotecario.puml)**: Casos de uso administrativos
+![Casos de Uso Generales](casos-de-uso.png)
+
+**Explicación del diagrama**: Este diagrama presenta la vista completa del sistema organizada en 7 paquetes principales: Gestión de Usuarios, Gestión de Items, Gestión de Préstamos, Gestión de Reservas, Gestión de Multas, Reportes y Consultas, y Sistema de Menús Interactivos. Cada actor tiene diferentes niveles de acceso, donde el Bibliotecario tiene privilegios administrativos completos, el Docente tiene funcionalidades extendidas, y el Alumno tiene acceso básico. El Sistema actor representa las funciones automáticas como generación de multas y notificaciones.
+
+---
+
+### 👨‍🎓 Casos de Uso - Alumno
+
+Este diagrama detalla específicamente las funcionalidades disponibles para los usuarios tipo Alumno. Los casos de uso están organizados en 5 áreas principales que cubren todas las necesidades básicas de un estudiante en el sistema bibliotecario.
+
+![Casos de Uso - Alumno](casos-uso-alumno.png)
+
+**Explicación del diagrama**: Los casos de uso del alumno están agrupados por colores según su funcionalidad:
+- **Verde claro** (Gestión de Perfil): Funciones básicas de usuario para mantener información personal actualizada
+- **Amarillo claro** (Búsqueda y Consulta): Herramientas de búsqueda y consulta del catálogo, esenciales para localizar material bibliográfico
+- **Cian claro** (Préstamos): Operaciones relacionadas con préstamos, desde solicitud hasta renovación
+- **Lavanda** (Reservas): Sistema de reservas para material no disponible
+- **Rosa claro** (Multas y Pagos): Consulta y gestión de multas pendientes
+
+Las relaciones "include" muestran que tanto solicitar préstamo como realizar reserva requieren verificar disponibilidad de items, mientras que la relación "extend" indica que renovar préstamo es una extensión opcional de consultar fechas de devolución.
+
+---
+
+### 👨‍🏫 Casos de Uso - Docente
+
+El diagrama para docentes muestra funcionalidades extendidas y privilegios especiales que reflejan las necesidades académicas e institucionales de los profesores universitarios.
+
+![Casos de Uso - Docente](casos-uso-docente.png)
+
+**Explicación del diagrama**: Los docentes tienen acceso a funcionalidades especializadas organizadas en 6 categorías:
+- **Verde claro** (Gestión de Perfil): Similar a alumnos pero con opciones adicionales
+- **Amarillo claro** (Búsqueda Avanzada): Búsquedas especializadas para material didáctico, bibliografía especializada y recursos multimedia
+- **Cian claro** (Préstamos Extendidos): Préstamos de larga duración (30 días vs 14), múltiples renovaciones y préstamos domiciliarios
+- **Lavanda** (Reservas Prioritarias): Sistema de reservas con prioridad alta y reservas para uso en clase
+- **Azul claro** (Servicios Especiales): Acceso a colección docente exclusiva y solicitudes de adquisición de material
+- **Rosa claro** (Multas y Gestión): Incluye la posibilidad de solicitar exención de multas con justificación académica
+
+Las especializaciones muestran que los préstamos docentes tienen 30 días vs 15 días estándar, y las reservas tienen prioridad alta en el sistema.
+
+---
+
+### 👩‍💼 Casos de Uso - Bibliotecario (Empleado)
+
+Este diagrama presenta el conjunto más completo de funcionalidades, ya que los bibliotecarios son los administradores del sistema con acceso total a todas las operaciones administrativas y de gestión.
+
+![Casos de Uso - Bibliotecario](casos-uso-bibliotecario.png)
+
+**Explicación del diagrama**: Los casos de uso del bibliotecario abarcan 8 áreas funcionales principales:
+- **Gris claro** (Autenticación y Sesión): Gestión segura de sesiones con trazabilidad
+- **Verde claro** (Gestión de Usuarios): CRUD completo de usuarios con capacidades de búsqueda y administración
+- **Amarillo claro** (Gestión de Items): Administración completa del catálogo bibliotecario
+- **Cian claro** (Gestión de Préstamos): Procesamiento de préstamos con validaciones y generación automática de multas
+- **Lavanda** (Gestión de Reservas): Administración del sistema de reservas y notificaciones
+- **Rosa claro** (Gestión de Multas): Control completo de multas incluyendo exoneraciones
+- **Azul acero** (Reportes y Estadísticas): Generación de reportes gerenciales y auditorías
+- **Trigo** (Gestión de Empleados): Funciones administrativas restringidas al Bibliotecario Jefe
+
+Las relaciones "include" muestran dependencias funcionales (procesar préstamo requiere buscar usuario e item), mientras que las relaciones "extend" indican funcionalidades condicionales (generar multa se ejecuta solo si hay atraso en devolución).
+
+**Restricciones de acceso**: Algunos casos de uso (UC36, UC38) están marcados con restricciones especiales, indicando que solo el Bibliotecario Jefe puede ejecutar funciones de gestión de empleados.
 
 ## Trazabilidad
 
@@ -347,6 +398,39 @@ Los diagramas visuales de casos de uso están disponibles en:
 - **Prestamo**: UC-ALU-08, UC-DOC-09, UC-BIB-16 a UC-BIB-21
 - **Reserva**: UC-ALU-12, UC-DOC-14, UC-BIB-22 a UC-BIB-26
 - **Multa**: UC-ALU-15, UC-SYS-01, UC-BIB-27 a UC-BIB-30
+
+## Código Fuente de Diagramas
+
+Los diagramas mostrados anteriormente fueron generados a partir de código PlantUML, que permite una especificación textual clara y mantenible de los casos de uso. Los archivos fuente están disponibles en:
+
+### 📄 **Archivos PlantUML**
+- **[casos-de-uso.puml](casos-de-uso.puml)**: Código fuente del diagrama general completo
+- **[casos-uso-alumno.puml](casos-uso-alumno.puml)**: Especificación de casos de uso para alumnos
+- **[casos-uso-docente.puml](casos-uso-docente.puml)**: Especificación de casos de uso para docentes
+- **[casos-uso-bibliotecario.puml](casos-uso-bibliotecario.puml)**: Especificación de casos de uso administrativos
+
+### 🔧 **Regenerar Diagramas**
+
+Para regenerar los diagramas PNG a partir de los archivos PlantUML:
+
+```bash
+# Instalar PlantUML
+brew install plantuml
+# o
+npm install -g node-plantuml
+
+# Generar diagramas
+plantuml docs/casos-de-uso.puml
+plantuml docs/casos-uso-alumno.puml
+plantuml docs/casos-uso-docente.puml
+plantuml docs/casos-uso-bibliotecario.puml
+```
+
+Los archivos PlantUML utilizan una sintaxis declarativa que facilita:
+- **Mantenimiento**: Cambios textuales simples
+- **Control de versiones**: Diff claro de modificaciones
+- **Consistencia**: Estilo uniforme en todos los diagramas
+- **Automatización**: Generación automática en CI/CD
 
 ---
 
