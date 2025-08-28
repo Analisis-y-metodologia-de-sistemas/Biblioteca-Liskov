@@ -1,10 +1,43 @@
-# Sistema de Gestión de Biblioteca - Arquitectura y Documentación
+# 📚 Biblioteca Liskov: Un Sistema de Gestión Bibliotecaria Inteligente
 
-## Descripción General
+## 🎭 La Historia Detrás del Código
 
-Sistema de gestión bibliotecaria desarrollado con arquitectura hexagonal que permite la administración completa de una biblioteca universitaria. El sistema maneja usuarios (alumnos, docentes, empleados), préstamos, devoluciones, multas y reservas.
+> *"En una universidad donde el conocimiento fluye como ríos de sabiduría, existía un desafío ancestral: ¿cómo gestionar eficientemente miles de libros, cientos de usuarios y un sinfín de préstamos sin perder la cordura?"*
 
-## Características Principales
+Imagina a **María**, bibliotecaria de la Universidad Nacional, enfrentándose cada mañana a una montaña de tareas: estudiantes esperando libros, profesores necesitando recursos específicos, multas acumulándose, reservas perdidas en papeles amarillentos. Un caos organizado que clama por una solución elegante.
+
+### 🚀 El Nacimiento de una Solución
+
+Aquí nace **Biblioteca Liskov**, nombrada en honor a Barbara Liskov y su principio de sustitución que garantiza que cada componente del sistema sea intercambiable y confiable. Como los principios SOLID que guían su arquitectura, este sistema transforma el caos bibliotecario en una sinfonía digital perfectamente orquestada.
+
+### 🎯 La Misión
+
+Biblioteca Liskov no es solo un sistema de gestión; es el puente entre el conocimiento y quienes lo buscan. Cada línea de código cuenta una historia:
+
+- **👨‍🎓 Para Ana, la estudiante**: Que puede reservar ese libro imprescindible para su tesis sin hacer colas interminables
+- **👨‍🏫 Para Dr. Pérez, el profesor**: Quien necesita acceso prioritario a recursos académicos para sus investigaciones
+- **👩‍💼 Para María, la bibliotecaria**: Que finalmente puede administrar todo desde una interfaz intuitiva y confiable
+
+### 🏗️ La Arquitectura de los Sueños
+
+Como una catedral gótica, donde cada arco sostiene el conjunto sin comprometer la belleza, Biblioteca Liskov utiliza **Arquitectura Hexagonal**. No es solo código; es filosofía aplicada:
+
+```
+🎭 Presentation Layer  → La cara amable del sistema
+🧠 Application Layer   → El cerebro que toma decisiones  
+💎 Domain Layer        → El corazón donde vive la lógica de negocio
+🔧 Infrastructure Layer → Los cimientos sólidos que sostienen todo
+```
+
+### 🌟 El Resultado
+
+Un sistema que no solo funciona, sino que **inspira confianza**. Donde cada préstamo se registra con precisión, cada multa se calcula justamente, y cada reserva se procesa con la eficiencia de un reloj suizo.
+
+**Biblioteca Liskov**: *Donde la tecnología encuentra el propósito, y el código sirve a la humanidad.*
+
+---
+
+## 🛠️ Características Principales
 
 - 🏗️ **Arquitectura Hexagonal**: Separación clara entre dominio, aplicación e infraestructura
 - 👥 **Gestión de Usuarios**: Alumnos, docentes y empleados con diferentes privilegios
