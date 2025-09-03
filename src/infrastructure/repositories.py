@@ -123,8 +123,15 @@ class ItemBibliotecaRepository(IItemBibliotecaRepository):
         rows = self.orm.select(self.table, "categoria = ?", (categoria,))
         return [self._row_to_entity(row) for row in rows]
     
+    def buscar_por_categoria(self, categoria: CategoriaItem) -> List[ItemBiblioteca]:
+        return self.listar_por_categoria(categoria.value)
+    
     def listar_todos(self) -> List[ItemBiblioteca]:
         rows = self.orm.select(self.table)
+        return [self._row_to_entity(row) for row in rows]
+    
+    def listar_disponibles(self) -> List[ItemBiblioteca]:
+        rows = self.orm.select(self.table, "estado = ?", ('disponible',))
         return [self._row_to_entity(row) for row in rows]
     
     def actualizar(self, item: ItemBiblioteca) -> ItemBiblioteca:
@@ -160,6 +167,7 @@ class PrestamoRepository(IPrestamoRepository):
             'usuario_id': prestamo.usuario_id,
             'item_id': prestamo.item_id,
             'empleado_id': prestamo.empleado_id,
+            'fecha_prestamo': prestamo.fecha_prestamo.isoformat() if prestamo.fecha_prestamo else None,
             'fecha_devolucion_esperada': prestamo.fecha_devolucion_esperada.isoformat() if prestamo.fecha_devolucion_esperada else None,
             'activo': prestamo.activo
         }
@@ -184,8 +192,11 @@ class PrestamoRepository(IPrestamoRepository):
         return [self._row_to_entity(row) for row in rows]
     
     def listar_activos(self) -> List[Prestamo]:
-        rows = self.orm.select(self.table, "activo = 1")
+        rows = self.orm.select(self.table, "activo = ?", (True,))
         return [self._row_to_entity(row) for row in rows]
+    
+    def listar_prestamos_activos(self) -> List[Prestamo]:
+        return self.listar_activos()
     
     def actualizar(self, prestamo: Prestamo) -> Prestamo:
         data = self._entity_to_dict(prestamo)
@@ -214,6 +225,7 @@ class ReservaRepository(IReservaRepository):
             'usuario_id': reserva.usuario_id,
             'item_id': reserva.item_id,
             'empleado_id': reserva.empleado_id,
+            'fecha_reserva': reserva.fecha_reserva.isoformat() if reserva.fecha_reserva else None,
             'fecha_expiracion': reserva.fecha_expiracion.isoformat() if reserva.fecha_expiracion else None,
             'activa': reserva.activa
         }
@@ -233,8 +245,18 @@ class ReservaRepository(IReservaRepository):
         return [self._row_to_entity(row) for row in rows]
     
     def listar_activas(self) -> List[Reserva]:
-        rows = self.orm.select(self.table, "activa = 1")
+        rows = self.orm.select(self.table, "activa = ?", (True,))
         return [self._row_to_entity(row) for row in rows]
+    
+    def listar_reservas_activas(self) -> List[Reserva]:
+        return self.listar_activas()
+    
+    def listar_por_item(self, item_id: int) -> List[Reserva]:
+        rows = self.orm.select(self.table, "item_id = ?", (item_id,))
+        return [self._row_to_entity(row) for row in rows]
+    
+    def cancelar_reserva(self, id: int):
+        self.orm.update(self.table, {'activa': False}, "id = ?", (id,))
     
     def actualizar(self, reserva: Reserva) -> Reserva:
         data = self._entity_to_dict(reserva)
@@ -266,6 +288,7 @@ class MultaRepository(IMultaRepository):
             'empleado_id': multa.empleado_id,
             'monto': multa.monto,
             'descripcion': multa.descripcion,
+            'fecha_multa': multa.fecha_multa.isoformat() if multa.fecha_multa else None,
             'pagada': multa.pagada
         }
     
@@ -284,8 +307,15 @@ class MultaRepository(IMultaRepository):
         return [self._row_to_entity(row) for row in rows]
     
     def listar_no_pagadas(self) -> List[Multa]:
-        rows = self.orm.select(self.table, "pagada = 0")
+        rows = self.orm.select(self.table, "pagada = ?", (False,))
         return [self._row_to_entity(row) for row in rows]
+    
+    def listar_multas_pendientes(self) -> List[Multa]:
+        return self.listar_no_pagadas()
+    
+    def marcar_como_pagada(self, id: int, fecha_pago):
+        from datetime import date
+        self.orm.update(self.table, {'pagada': True, 'fecha_pago': fecha_pago.isoformat()}, "id = ?", (id,))
     
     def actualizar(self, multa: Multa) -> Multa:
         data = self._entity_to_dict(multa)
