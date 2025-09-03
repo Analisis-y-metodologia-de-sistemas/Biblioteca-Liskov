@@ -5,11 +5,7 @@ from colorama import Fore, Back, Style, init
 
 init(autoreset=True)
 
-try:
-    from getch import getch
-    GETCH_AVAILABLE = True
-except ImportError:
-    GETCH_AVAILABLE = False
+# Sistema simplificado basado en input() estándar
 
 
 class MenuItem:
@@ -19,73 +15,43 @@ class MenuItem:
         self.description = description
 
 
-def wait_for_key():
-    """Espera a que se presione una tecla y devuelve el código de la tecla"""
-    if not GETCH_AVAILABLE:
-        # Fallback si getch no está disponible
-        response = input(f"\n{Fore.CYAN}Usa números o ENTER: {Style.RESET_ALL}").strip()
-        if response.isdigit():
-            return f"digit_{response}"
-        return 'enter'
-    
+def get_user_choice():
+    """Obtiene la elección del usuario usando entrada simple"""
     try:
-        key = getch()
+        response = input(f"\n{Fore.CYAN}Seleccione una opción (número o 'q' para salir): {Style.RESET_ALL}").strip().lower()
         
-        # Detectar secuencias de escape para teclas de flecha
-        if key == '\x1b':  # ESC
-            try:
-                key2 = getch()
-                if key2 == '[':
-                    key3 = getch()
-                    if key3 == 'A':
-                        return 'up'
-                    elif key3 == 'B':
-                        return 'down'
-                    elif key3 == 'C':
-                        return 'right'
-                    elif key3 == 'D':
-                        return 'left'
-                return 'esc'
-            except:
-                return 'esc'
-        elif key == '\r' or key == '\n':
-            return 'enter'
-        elif key == 'q' or key == 'Q':
+        if response == 'q':
             return 'q'
-        elif key.isdigit():
-            return f"digit_{key}"
+        elif response == '':
+            return 'enter'
+        elif response.isdigit():
+            return f"digit_{response}"
         else:
-            return 'other'
-            
-    except Exception:
-        # Fallback final
-        return 'enter'
+            return 'invalid'
+    except (EOFError, KeyboardInterrupt):
+        return 'q'
 
 
-def clear_lines(num_lines: int):
-    """Limpia un número específico de líneas hacia arriba"""
-    for _ in range(num_lines):
-        print('\033[1A\033[2K', end='')  # Mover hacia arriba y limpiar línea
 
 
 def show_dropdown_menu(
     title: str,
     items: List[MenuItem],
     selected_index: int = 0,
-    show_numbers: bool = False,
+    show_numbers: bool = True,
     show_descriptions: bool = True,
     allow_cancel: bool = True
 ) -> Optional[MenuItem]:
     """
-    Muestra un menú desplegable interactivo
+    Muestra un menú numerado simple
     
     Args:
         title: Título del menú
         items: Lista de elementos MenuItem
-        selected_index: Índice inicial seleccionado
+        selected_index: Índice inicial seleccionado (no usado en modo numérico)
         show_numbers: Mostrar números de opción
         show_descriptions: Mostrar descripciones de items
-        allow_cancel: Permitir cancelar con ESC/Q
+        allow_cancel: Permitir cancelar con Q
         
     Returns:
         MenuItem seleccionado o None si se canceló
@@ -93,79 +59,50 @@ def show_dropdown_menu(
     if not items:
         return None
     
-    current_index = max(0, min(selected_index, len(items) - 1))
-    
     while True:
-        # Limpiar pantalla parcialmente si es necesario
-        if 'lines_printed' in locals():
-            clear_lines(lines_printed)
-        
-        lines_printed = 0
-        
         # Mostrar título
         print(f"\n{Fore.CYAN}{Style.BRIGHT}{title}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'─' * len(title)}{Style.RESET_ALL}")
-        lines_printed += 2
         
         # Mostrar instrucciones
-        if GETCH_AVAILABLE:
-            instructions = f"{Fore.YELLOW}↑↓ Navegar | ENTER Seleccionar | 1-9 Directo"
-        else:
-            instructions = f"{Fore.YELLOW}Números para seleccionar | ENTER para confirmar"
-        
+        instructions = f"{Fore.YELLOW}Ingrese el número de la opción"
         if allow_cancel:
-            instructions += f" | Q Cancelar"
+            instructions += f" | 'q' para cancelar"
         print(instructions + Style.RESET_ALL)
-        lines_printed += 1
         
         print()  # Línea en blanco
-        lines_printed += 1
         
         # Mostrar items
         for i, item in enumerate(items):
-            prefix = f"{i + 1}. " if len(items) <= 9 else f"{i + 1:2d}. "
-            
-            if i == current_index:
-                # Item activo/seleccionado (resaltado)
-                line = f"{Back.BLUE}{Fore.WHITE}▶ {prefix}{item.text[:45]:<47}{Style.RESET_ALL}"
-            else:
-                # Item normal
-                line = f"  {prefix}{item.text[:45]}"
-            
+            prefix = f"{i + 1}. "
+            line = f"  {prefix}{item.text}"
             print(line)
-            lines_printed += 1
             
-            # Mostrar descripción del item activo
-            if show_descriptions and i == current_index and item.description:
-                desc_line = f"   {Fore.YELLOW}💡 {item.description}{Style.RESET_ALL}"
+            # Mostrar descripción si está disponible
+            if show_descriptions and item.description:
+                desc_line = f"     {Fore.YELLOW}💡 {item.description}{Style.RESET_ALL}"
                 print(desc_line)
-                lines_printed += 1
         
         # Obtener input del usuario
-        key = wait_for_key()
+        choice = get_user_choice()
         
-        if not key:  # Si no se capturó tecla válida, continuar
-            continue
-            
-        if key == 'up':
-            current_index = (current_index - 1) % len(items)
-        elif key == 'down':
-            current_index = (current_index + 1) % len(items)
-        elif key == 'enter':
-            # Solo ENTER selecciona el item
-            return items[current_index]
-        elif key.startswith('digit_'):
-            # Selección por número como alternativa
-            digit = key.split('_')[1]
+        if choice == 'q' and allow_cancel:
+            return None
+        elif choice.startswith('digit_'):
+            digit = choice.split('_')[1]
             try:
                 num = int(digit)
                 if 1 <= num <= len(items):
                     return items[num - 1]
+                else:
+                    print(f"{Fore.RED}❌ Opción inválida. Seleccione un número entre 1 y {len(items)}{Style.RESET_ALL}")
+                    continue
             except ValueError:
-                pass
-        elif key in ['q', 'esc'] and allow_cancel:
-            return None
-        # Ignorar cualquier otra tecla y continuar navegando
+                print(f"{Fore.RED}❌ Entrada inválida{Style.RESET_ALL}")
+                continue
+        else:
+            print(f"{Fore.RED}❌ Entrada inválida. Use números del 1 al {len(items)}{Style.RESET_ALL}")
+            continue
 
 
 def select_from_list(
@@ -216,7 +153,7 @@ def select_from_list(
 
 def confirm_action(message: str, default: bool = False) -> bool:
     """
-    Muestra un diálogo de confirmación con navegación por flechas
+    Muestra un diálogo de confirmación simple
     
     Args:
         message: Mensaje a mostrar
@@ -230,12 +167,9 @@ def confirm_action(message: str, default: bool = False) -> bool:
         MenuItem("No", False, "Cancelar la acción")
     ]
     
-    initial_index = 0 if default else 1
-    
     result = show_dropdown_menu(
         title=message,
         items=options,
-        selected_index=initial_index,
         show_descriptions=True,
         allow_cancel=True
     )

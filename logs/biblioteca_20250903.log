@@ -1,0 +1,7 @@
+2025-09-03 15:05:34,615 - biblioteca_liskov - INFO - Iniciando Sistema de Biblioteca Liskov
+2025-09-03 15:05:40,954 - biblioteca_liskov - WARNING - Intento de login fallido: contraseña incorrecta para 'arodriguez'
+2025-09-03 15:05:49,587 - biblioteca_liskov - INFO - Iniciando Sistema de Biblioteca Liskov
+2025-09-03 15:05:53,929 - biblioteca_liskov - INFO - Login exitoso: Ana Rodriguez (arodriguez)
+2025-09-03 15:10:13,347 - biblioteca_liskov - INFO - Iniciando Sistema de Biblioteca Liskov
+2025-09-03 15:10:25,575 - biblioteca_liskov - INFO - Login exitoso: Carlos Martinez (cmartinez)
+2025-09-03 15:12:00,617 - biblioteca_liskov - INFO - Préstamo realizado: Usuario maria.gonzalez@universidad.edu, Item Clean Code
