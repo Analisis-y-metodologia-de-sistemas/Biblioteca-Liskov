@@ -1,7 +1,8 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, List
 from datetime import datetime
 from enum import Enum
+from .value_objects import Email, Money, ISBN
 
 
 class TipoUsuario(Enum):
@@ -47,12 +48,25 @@ class Usuario:
     id: Optional[int] = None
     nombre: str = ""
     apellido: str = ""
-    email: str = ""
+    email: Email = field(default_factory=lambda: Email(""))
     tipo: TipoUsuario = TipoUsuario.ALUMNO
     numero_identificacion: str = ""
     telefono: Optional[str] = None
     activo: bool = True
     fecha_registro: Optional[datetime] = None
+    _multas_pendientes: List['Multa'] = field(default_factory=list, init=False)
+
+    def nombre_completo(self) -> str:
+        """Retorna el nombre completo del usuario"""
+        return f"{self.nombre} {self.apellido}"
+
+    def puede_hacer_prestamo(self) -> bool:
+        """Verifica si el usuario puede hacer préstamos"""
+        return self.activo and not self.tiene_multas_pendientes()
+
+    def tiene_multas_pendientes(self) -> bool:
+        """Verifica si el usuario tiene multas sin pagar"""
+        return any(not multa.pagada for multa in self._multas_pendientes)
 
 
 @dataclass
