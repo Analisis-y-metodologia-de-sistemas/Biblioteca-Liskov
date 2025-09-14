@@ -245,8 +245,10 @@ class ConsoleUI:
 
             # Confirmar préstamo
             if not confirm_action(
-                (f"¿Confirmar préstamo de '{item_seleccionado.titulo}' "
-                 f"a {usuario_seleccionado.nombre} por {dias_prestamo} días?"),
+                (
+                    f"¿Confirmar préstamo de '{item_seleccionado.titulo}' "
+                    f"a {usuario_seleccionado.nombre} por {dias_prestamo} días?"
+                ),
                 default=True,
             ):
                 show_warning("Préstamo cancelado")
@@ -1130,8 +1132,10 @@ class ConsoleUI:
                         MenuItem(
                             f"[{item.id}] {item.titulo}",
                             item,
-                            (f"{emoji} {item.estado.value.capitalize()} | Autor: {item.autor or 'N/A'} | "
-                             f"Ubicación: {item.ubicacion or 'N/A'}"),
+                            (
+                                f"{emoji} {item.estado.value.capitalize()} | Autor: {item.autor or 'N/A'} | "
+                                f"Ubicación: {item.ubicacion or 'N/A'}"
+                            ),
                         )
                     )
 
@@ -1168,8 +1172,10 @@ class ConsoleUI:
             print(f"📖 ISBN: {item.isbn or 'No especificado'}")
             print(f"📊 Estado: {emoji} {item.estado.value.capitalize()}")
             print(f"📍 Ubicación: {item.ubicacion or 'No especificada'}")
-            print(f"📅 Fecha adquisición: "
-                  f"{item.fecha_adquisicion.strftime('%d/%m/%Y') if item.fecha_adquisicion else 'No registrada'}")
+            print(
+                f"📅 Fecha adquisición: "
+                f"{item.fecha_adquisicion.strftime('%d/%m/%Y') if item.fecha_adquisicion else 'No registrada'}"
+            )
 
             if item.descripcion:
                 print(f"📝 Descripción: {item.descripcion}")
