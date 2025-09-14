@@ -61,7 +61,7 @@ def main():
         for i, libro in enumerate(libros[:10]):  # Mostrar primeros 10
             estado_emoji = {"disponible": "✅", "prestado": "📤", "en_reparacion": "🔧", "perdido": "❌"}
             emoji = estado_emoji.get(libro.estado.value, "❓")
-            print(f"{i+1:2d}. {emoji} [{libro.id:2d}] {libro.titulo}")
+            print(f"{i + 1:2d}. {emoji} [{libro.id:2d}] {libro.titulo}")
             print(f"    ✍️  {libro.autor or 'Autor no especificado'}")
             print(f"    📍 {libro.ubicacion or 'Ubicación no especificada'}")
             print()
