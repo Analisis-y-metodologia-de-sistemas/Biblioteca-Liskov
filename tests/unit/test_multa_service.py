@@ -7,14 +7,14 @@ import os
 import sys
 import unittest
 from datetime import datetime
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 # Agregar el path del proyecto
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from src.application.interfaces import IMultaRepository, IUsuarioRepository
 from src.application.services import MultaService
-from src.domain.entities import Multa, TipoUsuario, Usuario
+from src.domain.entities import Multa
 
 
 class TestMultaService(unittest.TestCase):

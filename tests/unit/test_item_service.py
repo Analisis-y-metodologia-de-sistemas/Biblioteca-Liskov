@@ -6,8 +6,7 @@ Tests unitarios para ItemBibliotecaService
 import os
 import sys
 import unittest
-from datetime import datetime
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 # Agregar el path del proyecto
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))

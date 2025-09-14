@@ -57,6 +57,7 @@ class TestSistemaCompleto(unittest.TestCase):
             password="test123",
             cargo="Bibliotecario",
         )
+        self.assertIsNotNone(empleado)
 
         # Autenticar empleado
         login_exitoso = self.auth_service.login("testuser", "test123")
@@ -150,6 +151,7 @@ class TestSistemaCompleto(unittest.TestCase):
         empleado = self.auth_service.crear_empleado(
             nombre="Test", apellido="Empleado", email="test2@biblioteca.com", usuario_sistema="test2", password="pass123"
         )
+        self.assertIsNotNone(empleado)
 
         self.auth_service.login("test2", "pass123")
         empleado_actual = self.auth_service.get_empleado_actual()
@@ -198,14 +200,18 @@ class TestSistemaCompleto(unittest.TestCase):
 
         # Crear varios items de diferentes categorías
         libro1 = self.item_service.agregar_item(titulo="Python Crash Course", categoria="libro", autor="Eric Matthes")
+        self.assertIsNotNone(libro1)
 
         libro2 = self.item_service.agregar_item(
             titulo="JavaScript: The Good Parts", categoria="libro", autor="Douglas Crockford"
         )
+        self.assertIsNotNone(libro2)
 
         revista = self.item_service.agregar_item(titulo="Scientific American", categoria="revista", autor="Varios")
+        self.assertIsNotNone(revista)
 
         dvd = self.item_service.agregar_item(titulo="Cosmos Documentary", categoria="dvd", autor="Neil deGrasse Tyson")
+        self.assertIsNotNone(dvd)
 
         # Test búsqueda por título
         resultados_python = self.item_service.buscar_por_titulo("Python")
@@ -292,6 +298,7 @@ class TestSistemaCompleto(unittest.TestCase):
         empleado = self.auth_service.crear_empleado(
             nombre="Test", apellido="User", email="test@test.com", usuario_sistema="test", password="test"
         )
+        self.assertIsNotNone(empleado)
         self.auth_service.login("test", "test")
         empleado_actual = self.auth_service.get_empleado_actual()
 

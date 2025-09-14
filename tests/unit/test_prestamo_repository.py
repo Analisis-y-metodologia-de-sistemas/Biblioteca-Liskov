@@ -1,8 +1,8 @@
 import unittest
-from datetime import date, datetime
-from unittest.mock import MagicMock, Mock
+from datetime import datetime
+from unittest.mock import Mock
 
-from src.domain.entities import CategoriaItem, EstadoItem, ItemBiblioteca, Prestamo, TipoUsuario, Usuario
+from src.domain.entities import CategoriaItem, ItemBiblioteca, Prestamo, TipoUsuario, Usuario
 from src.infrastructure.database import ORM
 from src.infrastructure.repositories import PrestamoRepository
 
