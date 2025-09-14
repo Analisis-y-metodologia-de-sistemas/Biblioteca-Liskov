@@ -78,7 +78,7 @@ class TestUsuarioRepository(unittest.TestCase):
 
         self.orm_mock.select.assert_called_once_with("usuarios", "email = ?", ("juan@example.com",))
         self.assertIsNotNone(resultado)
-        self.assertEqual(resultado.email, "juan@example.com")
+        self.assertEqual(resultado.email.value, "juan@example.com")
 
     def test_obtener_por_email_no_existente(self):
         self.orm_mock.select.return_value = []
@@ -119,7 +119,7 @@ class TestUsuarioRepository(unittest.TestCase):
         self.assertEqual(resultado.id, 1)
         self.assertEqual(resultado.nombre, "Juan")
         self.assertEqual(resultado.apellido, "Pérez")
-        self.assertEqual(resultado.email, "juan@example.com")
+        self.assertEqual(resultado.email.value, "juan@example.com")
         self.assertEqual(resultado.tipo, TipoUsuario.ALUMNO)
         self.assertEqual(resultado.numero_identificacion, "12345678")
         self.assertEqual(resultado.telefono, "555-1234")

@@ -1,6 +1,6 @@
 import hashlib
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from ..domain.entities import Empleado, SesionEmpleado
 from ..shared.logger import get_logger
@@ -57,7 +57,7 @@ class AuthService:
             self.logger.error(f"Error durante login: {str(e)}")
             return False
 
-    def logout(self):
+    def logout(self) -> None:
         """Cierra la sesión actual"""
         if self._sesion_actual:
             self.logger.info(f"Logout: {self._sesion_actual.empleado.nombre} {self._sesion_actual.empleado.apellido}")
@@ -127,7 +127,7 @@ class AuthService:
 
         return empleado_creado
 
-    def listar_empleados_activos(self) -> list[Empleado]:
+    def listar_empleados_activos(self) -> List[Empleado]:
         """Lista todos los empleados activos"""
         return self.empleado_repo.listar_activos()
 

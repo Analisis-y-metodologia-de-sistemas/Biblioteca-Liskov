@@ -13,11 +13,11 @@ class Logger:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self) -> None:
         if self._logger is None:
             self._setup_logger()
 
-    def _setup_logger(self):
+    def _setup_logger(self) -> None:
         self._logger = logging.getLogger("biblioteca_liskov")
         self._logger.setLevel(logging.INFO)
 
@@ -39,19 +39,19 @@ class Logger:
         self._logger.addHandler(file_handler)
         self._logger.addHandler(console_handler)
 
-    def info(self, message: str):
+    def info(self, message: str) -> None:
         if self._logger:
             self._logger.info(message)
 
-    def warning(self, message: str):
+    def warning(self, message: str) -> None:
         if self._logger:
             self._logger.warning(message)
 
-    def error(self, message: str):
+    def error(self, message: str) -> None:
         if self._logger:
             self._logger.error(message)
 
-    def debug(self, message: str):
+    def debug(self, message: str) -> None:
         if self._logger:
             self._logger.debug(message)
 

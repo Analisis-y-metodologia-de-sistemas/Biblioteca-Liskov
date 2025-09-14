@@ -1,5 +1,6 @@
 import sys
 from datetime import datetime
+from typing import List, Optional, Tuple
 
 from ..application.auth_service import AuthService
 from ..application.services import ItemBibliotecaService, MultaService, PrestamoService, ReservaService, UsuarioService
@@ -26,7 +27,7 @@ class ConsoleUI:
         reserva_service: ReservaService,
         multa_service: MultaService,
         auth_service: AuthService,
-    ):
+    ) -> None:
         self.usuario_service = usuario_service
         self.item_service = item_service
         self.prestamo_service = prestamo_service
@@ -35,7 +36,7 @@ class ConsoleUI:
         self.auth_service = auth_service
         self.logger = get_logger()
 
-    def mostrar_menu_principal(self):
+    def mostrar_menu_principal(self) -> Optional[MenuItem]:
         opciones = [
             ("👤 Gestión de Usuarios", "1", "Registrar, buscar y gestionar usuarios del sistema"),
             ("📚 Gestión de Items", "2", "Agregar, buscar y gestionar items de la biblioteca"),
@@ -52,7 +53,7 @@ class ConsoleUI:
 
         return show_dropdown_menu(title="SISTEMA DE GESTIÓN BIBLIOTECA LISKOV", items=menu_items, allow_cancel=False)
 
-    def mostrar_menu_usuarios(self):
+    def mostrar_menu_usuarios(self) -> Optional[MenuItem]:
         opciones = [
             ("Registrar nuevo usuario", "1", "Crear un nuevo usuario en el sistema"),
             ("Buscar usuario por email", "2", "Localizar usuario específico por email"),
@@ -66,7 +67,7 @@ class ConsoleUI:
 
         return show_dropdown_menu(title="GESTIÓN DE USUARIOS", items=menu_items, allow_cancel=True)
 
-    def mostrar_menu_items(self):
+    def mostrar_menu_items(self) -> Optional[MenuItem]:
         opciones = [
             ("Agregar nuevo item", "1", "Añadir nuevo material al catálogo"),
             ("Buscar por título", "2", "Localizar items por título"),
@@ -82,7 +83,7 @@ class ConsoleUI:
 
         return show_dropdown_menu(title="GESTIÓN DE ITEMS", items=menu_items, allow_cancel=True)
 
-    def mostrar_menu_prestamos(self):
+    def mostrar_menu_prestamos(self) -> Optional[MenuItem]:
         opciones = [
             ("Realizar préstamo", "1", "Procesar préstamo de item a usuario"),
             ("Devolver item", "2", "Registrar devolución de item prestado"),

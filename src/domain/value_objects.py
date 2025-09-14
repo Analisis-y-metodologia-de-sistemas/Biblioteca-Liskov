@@ -12,7 +12,7 @@ class Email:
 
     value: str
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not self._is_valid_email(self.value):
             raise ValueError(f"Invalid email format: {self.value}")
 
@@ -31,7 +31,7 @@ class Money:
     amount: float
     currency: str = "ARS"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.amount < 0:
             raise ValueError("Money amount cannot be negative")
         if not self.currency:
@@ -57,7 +57,7 @@ class ISBN:
 
     value: str
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not self._is_valid_isbn(self.value):
             raise ValueError(f"Invalid ISBN format: {self.value}")
 
