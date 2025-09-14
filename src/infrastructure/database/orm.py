@@ -71,7 +71,7 @@ class ORM:
             activo BOOLEAN DEFAULT 1,
             fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
-        
+
         CREATE TABLE IF NOT EXISTS items_biblioteca (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             titulo TEXT NOT NULL,
@@ -84,7 +84,7 @@ class ORM:
             fecha_adquisicion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             valor_reposicion REAL
         );
-        
+
         CREATE TABLE IF NOT EXISTS empleados (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nombre TEXT NOT NULL,
@@ -97,7 +97,7 @@ class ORM:
             activo BOOLEAN DEFAULT 1,
             fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
-        
+
         CREATE TABLE IF NOT EXISTS prestamos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTEGER NOT NULL,
@@ -112,7 +112,7 @@ class ORM:
             FOREIGN KEY (item_id) REFERENCES items_biblioteca (id),
             FOREIGN KEY (empleado_id) REFERENCES empleados (id)
         );
-        
+
         CREATE TABLE IF NOT EXISTS reservas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTEGER NOT NULL,
@@ -125,7 +125,7 @@ class ORM:
             FOREIGN KEY (item_id) REFERENCES items_biblioteca (id),
             FOREIGN KEY (empleado_id) REFERENCES empleados (id)
         );
-        
+
         CREATE TABLE IF NOT EXISTS multas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario_id INTEGER NOT NULL,
@@ -139,7 +139,7 @@ class ORM:
             FOREIGN KEY (prestamo_id) REFERENCES prestamos (id),
             FOREIGN KEY (empleado_id) REFERENCES empleados (id)
         );
-        
+
         CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
         CREATE INDEX IF NOT EXISTS idx_empleados_usuario_sistema ON empleados(usuario_sistema);
         CREATE INDEX IF NOT EXISTS idx_empleados_email ON empleados(email);
