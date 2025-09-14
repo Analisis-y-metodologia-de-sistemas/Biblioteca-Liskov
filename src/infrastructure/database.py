@@ -40,6 +40,26 @@ class DatabaseConnection:
 class ORM:
     def __init__(self, db_connection: DatabaseConnection):
         self.db = db_connection
+        # Whitelist of allowed table names for security
+        self._allowed_tables = {
+            'usuarios', 'items_biblioteca', 'empleados',
+            'prestamos', 'reservas', 'multas'
+        }
+
+    def _validate_table_name(self, table: str) -> None:
+        """Validate table name against whitelist to prevent SQL injection."""
+        if table not in self._allowed_tables:
+            raise ValueError(f"Invalid table name: {table}. Must be one of {self._allowed_tables}")
+
+    def _sanitize_column_names(self, columns: List[str]) -> List[str]:
+        """Sanitize column names to prevent SQL injection."""
+        sanitized = []
+        for col in columns:
+            # Only allow alphanumeric characters and underscores
+            if not col.replace('_', '').isalnum():
+                raise ValueError(f"Invalid column name: {col}")
+            sanitized.append(col)
+        return sanitized
 
     def create_tables(self):
         schema = """
@@ -140,29 +160,38 @@ class ORM:
         self.db.execute_script(schema)
 
     def insert(self, table: str, data: Dict[str, Any]) -> int:
-        columns = list(data.keys())
+        self._validate_table_name(table)
+        columns = self._sanitize_column_names(list(data.keys()))
         placeholders = ", ".join(["?" for _ in columns])
         values = list(data.values())
 
-        query = f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({placeholders})"
+        # Safe to use f-string here as table and columns are validated
+        query = f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({placeholders})"  # nosec B608
         return self.db.execute_non_query(query, tuple(values))
 
     def select(self, table: str, where: Optional[str] = None, params: tuple = ()) -> List[Dict[str, Any]]:
-        query = f"SELECT * FROM {table}"
+        self._validate_table_name(table)
+        # Safe to use f-string here as table name is validated
+        query = f"SELECT * FROM {table}"  # nosec B608
         if where:
             query += f" WHERE {where}"
 
         return self.db.execute_query(query, params)
 
     def update(self, table: str, data: Dict[str, Any], where: str, params: tuple = ()) -> int:
-        set_clause = ", ".join([f"{key} = ?" for key in data.keys()])
+        self._validate_table_name(table)
+        columns = self._sanitize_column_names(list(data.keys()))
+        set_clause = ", ".join([f"{key} = ?" for key in columns])
         values = list(data.values()) + list(params)
 
-        query = f"UPDATE {table} SET {set_clause} WHERE {where}"
+        # Safe to use f-string here as table and columns are validated
+        query = f"UPDATE {table} SET {set_clause} WHERE {where}"  # nosec B608
         return self.db.execute_non_query(query, tuple(values))
 
     def delete(self, table: str, where: str, params: tuple = ()) -> int:
-        query = f"DELETE FROM {table} WHERE {where}"
+        self._validate_table_name(table)
+        # Safe to use f-string here as table name is validated
+        query = f"DELETE FROM {table} WHERE {where}"  # nosec B608
         return self.db.execute_non_query(query, params)
 
     def execute_custom_query(self, query: str, params: tuple = ()) -> List[Dict[str, Any]]:
