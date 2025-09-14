@@ -1,0 +1,46 @@
+# Development dependencies for Biblioteca Liskov
+
+# Core testing framework
+pytest==7.4.0
+pytest-cov==4.1.0
+pytest-mock==3.11.1
+pytest-xdist==3.3.1
+coverage==7.3.2
+
+# Code formatting and linting
+black==23.7.0
+isort==5.12.0
+flake8==6.0.0
+flake8-docstrings==1.7.0
+flake8-import-order==0.18.2
+flake8-bugbear==23.7.10
+
+# Type checking
+mypy==1.5.1
+types-setuptools==68.1.0.1
+
+# Security and quality
+bandit==1.7.5
+safety==2.3.5
+pylint==2.17.5
+
+# Pre-commit hooks
+pre-commit==3.3.3
+
+# Build and packaging
+build==0.10.0
+twine==4.0.2
+wheel==0.41.2
+
+# Documentation
+mkdocs==1.5.2
+mkdocs-material==9.1.21
+
+# Development utilities
+ipython==8.14.0
+ipdb==0.13.13
+watchdog==3.0.0
+
+# Complexity analysis
+complexity-report==0.3.1
+radon==6.0.1

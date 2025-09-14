@@ -1,5 +1,13 @@
 # Sistema de Gestión Bibliotecaria - Biblioteca Liskov
 
+[![CI Pipeline](https://github.com/Analisis-y-metodologia-de-sistemas/Biblioteca-Liskov/actions/workflows/ci.yml/badge.svg)](https://github.com/Analisis-y-metodologia-de-sistemas/Biblioteca-Liskov/actions/workflows/ci.yml)
+[![PR Checks](https://github.com/Analisis-y-metodologia-de-sistemas/Biblioteca-Liskov/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/Analisis-y-metodologia-de-sistemas/Biblioteca-Liskov/actions/workflows/pr-checks.yml)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+[![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## 📖 Descripción General
 
 Sistema de gestión bibliotecaria implementado siguiendo principios de **Clean Architecture** y patrones de diseño enterprise. El sistema demuestra la aplicación práctica de los principios SOLID, patrones de diseño GoF, y arquitectura hexagonal en un dominio de negocio real.
@@ -89,6 +97,7 @@ graph TB
 
 ### Prerrequisitos
 - Python 3.11 o superior
+- Git
 
 ### Instalación
 ```bash
@@ -102,6 +111,50 @@ pip install -r requirements.txt
 # Ejecutar el sistema
 python main.py
 ```
+
+## 👨‍💻 Desarrollo
+
+### Configuración del Entorno de Desarrollo
+```bash
+# Instalar dependencias de desarrollo
+make install-dev
+
+# O manualmente:
+pip install -r requirements-dev.txt
+pre-commit install
+```
+
+### Comandos de Desarrollo
+```bash
+# Ejecutar tests
+make test
+
+# Linting y formateo
+make lint
+make format
+
+# Verificar arquitectura limpia
+make architecture
+
+# Pipeline completo (como CI)
+make ci
+```
+
+### Flujo de Trabajo
+1. **Fork** del repositorio
+2. **Crear rama** para feature: `git checkout -b feature/nueva-funcionalidad`
+3. **Desarrollar** siguiendo Clean Architecture
+4. **Ejecutar tests**: `make test`
+5. **Verificar calidad**: `make lint`
+6. **Crear Pull Request**
+
+### CI/CD Pipeline
+- ✅ **Linting automático** con flake8, black, isort
+- ✅ **Tests automáticos** con pytest y coverage
+- ✅ **Análisis de seguridad** con bandit
+- ✅ **Verificación de arquitectura** limpia
+- ✅ **Type checking** con mypy
+- ✅ **Dependency scanning** con safety
 
 ## 📁 Estructura del Proyecto
 

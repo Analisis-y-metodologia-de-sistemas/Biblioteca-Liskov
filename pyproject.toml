@@ -1,0 +1,214 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "biblioteca-liskov"
+version = "0.1.0"
+description = "Sistema de gestión bibliotecaria implementado con Clean Architecture"
+authors = [{name = "Biblioteca Liskov Team", email = "team@biblioteca-liskov.edu"}]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+keywords = ["library", "clean-architecture", "education", "python"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Education",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+dependencies = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.1",
+    "bcrypt>=4.0.1",
+    "typing-extensions>=4.7.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+    "bandit>=1.7.5",
+    "safety>=2.3.0",
+    "pylint>=2.17.0",
+]
+test = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.1",
+    "pytest-xdist>=3.3.0",
+    "coverage>=7.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Analisis-y-metodologia-de-sistemas/Biblioteca-Liskov"
+Documentation = "https://github.com/Analisis-y-metodologia-de-sistemas/Biblioteca-Liskov/docs"
+Repository = "https://github.com/Analisis-y-metodologia-de-sistemas/Biblioteca-Liskov.git"
+Issues = "https://github.com/Analisis-y-metodologia-de-sistemas/Biblioteca-Liskov/issues"
+
+# === Tool Configurations ===
+
+[tool.black]
+line-length = 127
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 127
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+src_paths = ["src", "tests"]
+known_first_party = ["src"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+    "--tb=short",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-report=xml",
+    "--cov-fail-under=80",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+filterwarnings = [
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/venv/*",
+    "*/.venv/*",
+    "*/build/*",
+    "*/dist/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+show_missing = true
+precision = 2
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.bandit]
+exclude_dirs = ["tests", "build", "dist"]
+skips = ["B101", "B601"]  # Skip assert_used and shell_injection_process_false_positive
+
+[tool.bandit.assert_used]
+skips = ["*_test.py", "*/test_*.py"]
+
+[tool.pylint.messages_control]
+disable = [
+    "missing-docstring",
+    "invalid-name",
+    "too-few-public-methods",
+    "too-many-arguments",
+    "too-many-instance-attributes",
+    "duplicate-code",
+]
+
+[tool.pylint.format]
+max-line-length = 127
+
+[tool.pylint.design]
+max-complexity = 10
+max-args = 8
+max-locals = 15
+max-returns = 6
+max-branches = 12
+max-statements = 50
+
+[tool.flake8]
+max-line-length = 127
+max-complexity = 10
+select = ["E", "W", "F", "C90"]
+ignore = [
+    "E203",  # whitespace before ':'  (conflicts with black)
+    "E501",  # line too long (handled by black)
+    "W503",  # line break before binary operator (conflicts with black)
+]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    "venv",
+    ".tox",
+    ".eggs",
+]
+per-file-ignores = [
+    "__init__.py:F401",
+    "tests/*:F401,F811",
+]
