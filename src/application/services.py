@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
 
+from ..domain.value_objects import Email
+
 from ..domain.entities import (
     CategoriaItem,
     EstadoItem,
@@ -39,7 +41,7 @@ class UsuarioService:
         usuario = Usuario(
             nombre=nombre,
             apellido=apellido,
-            email=email,
+            email=Email(email),
             tipo=tipo,
             numero_identificacion=numero_identificacion,
             telefono=telefono,
@@ -172,13 +174,14 @@ class PrestamoService:
             item.estado = EstadoItem.DISPONIBLE
             self.item_repo.actualizar(item)
 
-        if prestamo.fecha_devolucion_real > prestamo.fecha_devolucion_esperada:
+        if (prestamo.fecha_devolucion_real and prestamo.fecha_devolucion_esperada and
+            prestamo.fecha_devolucion_real > prestamo.fecha_devolucion_esperada):
             dias_atraso = (prestamo.fecha_devolucion_real - prestamo.fecha_devolucion_esperada).days
             monto_multa = dias_atraso * 50.0  # $50 por día de atraso
 
             multa = Multa(
                 usuario_id=prestamo.usuario_id,
-                prestamo_id=prestamo.id,
+                prestamo_id=prestamo.id or 0,
                 empleado_id=prestamo.empleado_id,  # El mismo empleado que procesó el préstamo
                 monto=monto_multa,
                 descripcion=f"Devolución tardía: {dias_atraso} días de atraso",

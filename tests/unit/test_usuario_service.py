@@ -8,6 +8,8 @@ import sys
 import unittest
 from unittest.mock import Mock
 
+from src.domain.value_objects import Email
+
 # Agregar el path del proyecto
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -32,7 +34,7 @@ class TestUsuarioService(unittest.TestCase):
             id=1,
             nombre="Juan",
             apellido="Pérez",
-            email="juan.perez@test.com",
+            email=Email("juan.perez@test.com"),
             tipo=TipoUsuario.ALUMNO,
             numero_identificacion="12345678",
             telefono="+54-9-11-1234-5678",
@@ -52,7 +54,7 @@ class TestUsuarioService(unittest.TestCase):
 
         # Assert
         self.assertEqual(resultado.nombre, "Juan")
-        self.assertEqual(resultado.email, "juan.perez@test.com")
+        self.assertEqual(resultado.email.value, "juan.perez@test.com")
         self.assertEqual(resultado.tipo, TipoUsuario.ALUMNO)
         self.mock_repo.obtener_por_email.assert_called_once_with("juan.perez@test.com")
         self.mock_repo.crear.assert_called_once()
@@ -64,7 +66,7 @@ class TestUsuarioService(unittest.TestCase):
             id=1,
             nombre="Existente",
             apellido="Usuario",
-            email="juan.perez@test.com",
+            email=Email("juan.perez@test.com"),
             tipo=TipoUsuario.DOCENTE,
             numero_identificacion="87654321",
         )
@@ -75,7 +77,7 @@ class TestUsuarioService(unittest.TestCase):
             self.usuario_service.registrar_usuario(
                 nombre="Juan",
                 apellido="Pérez",
-                email="juan.perez@test.com",
+                email=Email("juan.perez@test.com"),
                 tipo=TipoUsuario.ALUMNO,
                 numero_identificacion="12345678",
             )
@@ -90,7 +92,7 @@ class TestUsuarioService(unittest.TestCase):
             id=1,
             nombre="Juan",
             apellido="Pérez",
-            email="juan.perez@test.com",
+            email=Email("juan.perez@test.com"),
             tipo=TipoUsuario.ALUMNO,
             numero_identificacion="12345678",
         )
@@ -123,7 +125,7 @@ class TestUsuarioService(unittest.TestCase):
                 id=1,
                 nombre="Juan",
                 apellido="Pérez",
-                email="juan@test.com",
+                email=Email("juan@test.com"),
                 tipo=TipoUsuario.ALUMNO,
                 numero_identificacion="12345",
             ),
@@ -131,7 +133,7 @@ class TestUsuarioService(unittest.TestCase):
                 id=2,
                 nombre="María",
                 apellido="González",
-                email="maria@test.com",
+                email=Email("maria@test.com"),
                 tipo=TipoUsuario.DOCENTE,
                 numero_identificacion="67890",
             ),
@@ -153,7 +155,7 @@ class TestUsuarioService(unittest.TestCase):
             id=1,
             nombre="Juan",
             apellido="Pérez",
-            email="juan.perez@test.com",
+            email=Email("juan.perez@test.com"),
             tipo=TipoUsuario.ALUMNO,
             numero_identificacion="12345678",
         )

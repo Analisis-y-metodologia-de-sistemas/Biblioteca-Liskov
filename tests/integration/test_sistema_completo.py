@@ -77,7 +77,7 @@ class TestSistemaCompleto(unittest.TestCase):
         )
 
         self.assertEqual(usuario.nombre, "Juan")
-        self.assertEqual(usuario.email, "juan.perez@test.com")
+        self.assertEqual(usuario.email.value, "juan.perez@test.com")
         self.assertEqual(usuario.tipo, TipoUsuario.ALUMNO)
 
         # 3. Agregar item

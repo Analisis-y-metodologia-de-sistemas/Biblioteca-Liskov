@@ -40,7 +40,7 @@ from src.container import Container
 from src.shared.logger import get_logger
 
 
-def main():
+def main() -> None:
     try:
         logger = get_logger()
         logger.info("Iniciando Sistema de Biblioteca Liskov")

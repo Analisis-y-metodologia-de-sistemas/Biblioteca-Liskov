@@ -48,10 +48,10 @@ class LimiteReservasExcedidoException(BibliotecaException):
 
 
 class MultaYaPagadaException(BibliotecaException):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Esta multa ya fue pagada")
 
 
 class PrestamoYaDevueltoException(BibliotecaException):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("Este préstamo ya fue devuelto")

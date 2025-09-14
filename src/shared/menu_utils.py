@@ -39,13 +39,13 @@ class Back:
 
 
 class MenuItem:
-    def __init__(self, text: str, value: Any = None, description: str = ""):
+    def __init__(self, text: str, value: Any = None, description: str = "") -> None:
         self.text = text
         self.value = value if value is not None else text
         self.description = description
 
 
-def get_user_choice():
+def get_user_choice() -> str:
     """Obtiene la elección del usuario usando entrada simple"""
     try:
         response = input(f"\n{Fore.CYAN}Seleccione una opción (número o 'q' para salir): {Style.RESET_ALL}").strip().lower()
@@ -194,26 +194,26 @@ def confirm_action(message: str, default: bool = False) -> bool:
 
     result = show_dropdown_menu(title=message, items=options, show_descriptions=True, allow_cancel=True)
 
-    return result.value if result else False
+    return bool(result.value) if result else False
 
 
-def show_info(message: str, title: str = "Información"):
+def show_info(message: str, title: str = "Información") -> None:
     """Muestra un mensaje informativo"""
     print(f"\n{Fore.BLUE}{Style.BRIGHT}ℹ️  {title}{Style.RESET_ALL}")
     print(f"{Fore.BLUE}{'─' * (len(title) + 3)}{Style.RESET_ALL}")
     print(f"{message}")
 
 
-def show_success(message: str):
+def show_success(message: str) -> None:
     """Muestra un mensaje de éxito"""
     print(f"\n{Fore.GREEN}✅ {message}{Style.RESET_ALL}")
 
 
-def show_error(message: str):
+def show_error(message: str) -> None:
     """Muestra un mensaje de error"""
     print(f"\n{Fore.RED}❌ {message}{Style.RESET_ALL}")
 
 
-def show_warning(message: str):
+def show_warning(message: str) -> None:
     """Muestra un mensaje de advertencia"""
     print(f"\n{Fore.YELLOW}⚠️  {message}{Style.RESET_ALL}")

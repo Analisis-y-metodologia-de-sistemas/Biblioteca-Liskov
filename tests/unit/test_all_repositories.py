@@ -22,6 +22,7 @@ from src.domain.entities import (
     TipoUsuario,
     Usuario,
 )
+from src.domain.value_objects import Email
 from src.infrastructure.database import ORM
 from src.infrastructure.repositories import (
     EmpleadoRepository,
@@ -142,7 +143,7 @@ class TestAllRepositories(unittest.TestCase):
         self.orm_mock.update.return_value = None
 
         # Crear entidades de test
-        usuario = Usuario(id=1, nombre="Juan", email="juan@test.com")
+        usuario = Usuario(id=1, nombre="Juan", email=Email("juan@test.com"))
         item = ItemBiblioteca(id=1, titulo="Test Book")
         empleado = Empleado(id=1, nombre="Ana", email="ana@test.com")
         prestamo = Prestamo(id=1, usuario_id=1, item_id=1)

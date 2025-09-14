@@ -29,11 +29,13 @@ class UsuarioRepository(IUsuarioRepository):
         self.table = "usuarios"
 
     def _row_to_entity(self, row: Dict[str, Any]) -> Usuario:
+        from ..domain.value_objects import Email
+
         return Usuario(
             id=row["id"],
             nombre=row["nombre"],
             apellido=row["apellido"],
-            email=row["email"],
+            email=Email(row["email"]),
             tipo=TipoUsuario(row["tipo"]),
             numero_identificacion=row["numero_identificacion"],
             telefono=row["telefono"],
@@ -45,7 +47,7 @@ class UsuarioRepository(IUsuarioRepository):
         data = {
             "nombre": usuario.nombre,
             "apellido": usuario.apellido,
-            "email": usuario.email,
+            "email": str(usuario.email),  # Convert Email value object to string
             "tipo": usuario.tipo.value,
             "numero_identificacion": usuario.numero_identificacion,
             "activo": usuario.activo,

@@ -4,11 +4,11 @@ from typing import Any, Dict, List, Optional
 
 
 class DatabaseConnection:
-    def __init__(self, db_path: str = "data/biblioteca.db"):
+    def __init__(self, db_path: str = "data/biblioteca.db") -> None:
         self.db_path = db_path
         self._ensure_directory()
 
-    def _ensure_directory(self):
+    def _ensure_directory(self) -> None:
         directory = os.path.dirname(self.db_path)
         if directory and not os.path.exists(directory):
             os.makedirs(directory)
@@ -37,7 +37,7 @@ class DatabaseConnection:
 
 
 class ORM:
-    def __init__(self, db_connection: DatabaseConnection):
+    def __init__(self, db_connection: DatabaseConnection) -> None:
         self.db = db_connection
         # Whitelist of allowed table names for security
         self._allowed_tables = {"usuarios", "items_biblioteca", "empleados", "prestamos", "reservas", "multas"}
