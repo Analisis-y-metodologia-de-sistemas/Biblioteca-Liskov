@@ -1,7 +1,8 @@
-import sys
 import os
-from typing import List, Any, Optional, Callable
-from colorama import Fore, Back, Style, init
+import sys
+from typing import Any, Callable, List, Optional
+
+from colorama import Back, Fore, Style, init
 
 init(autoreset=True)
 
@@ -19,19 +20,17 @@ def get_user_choice():
     """Obtiene la elección del usuario usando entrada simple"""
     try:
         response = input(f"\n{Fore.CYAN}Seleccione una opción (número o 'q' para salir): {Style.RESET_ALL}").strip().lower()
-        
-        if response == 'q':
-            return 'q'
-        elif response == '':
-            return 'enter'
+
+        if response == "q":
+            return "q"
+        elif response == "":
+            return "enter"
         elif response.isdigit():
             return f"digit_{response}"
         else:
-            return 'invalid'
+            return "invalid"
     except (EOFError, KeyboardInterrupt):
-        return 'q'
-
-
+        return "q"
 
 
 def show_dropdown_menu(
@@ -40,11 +39,11 @@ def show_dropdown_menu(
     selected_index: int = 0,
     show_numbers: bool = True,
     show_descriptions: bool = True,
-    allow_cancel: bool = True
+    allow_cancel: bool = True,
 ) -> Optional[MenuItem]:
     """
     Muestra un menú numerado simple
-    
+
     Args:
         title: Título del menú
         items: Lista de elementos MenuItem
@@ -52,44 +51,44 @@ def show_dropdown_menu(
         show_numbers: Mostrar números de opción
         show_descriptions: Mostrar descripciones de items
         allow_cancel: Permitir cancelar con Q
-        
+
     Returns:
         MenuItem seleccionado o None si se canceló
     """
     if not items:
         return None
-    
+
     while True:
         # Mostrar título
         print(f"\n{Fore.CYAN}{Style.BRIGHT}{title}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'─' * len(title)}{Style.RESET_ALL}")
-        
+
         # Mostrar instrucciones
         instructions = f"{Fore.YELLOW}Ingrese el número de la opción"
         if allow_cancel:
             instructions += f" | 'q' para cancelar"
         print(instructions + Style.RESET_ALL)
-        
+
         print()  # Línea en blanco
-        
+
         # Mostrar items
         for i, item in enumerate(items):
             prefix = f"{i + 1}. "
             line = f"  {prefix}{item.text}"
             print(line)
-            
+
             # Mostrar descripción si está disponible
             if show_descriptions and item.description:
                 desc_line = f"     {Fore.YELLOW}💡 {item.description}{Style.RESET_ALL}"
                 print(desc_line)
-        
+
         # Obtener input del usuario
         choice = get_user_choice()
-        
-        if choice == 'q' and allow_cancel:
+
+        if choice == "q" and allow_cancel:
             return None
-        elif choice.startswith('digit_'):
-            digit = choice.split('_')[1]
+        elif choice.startswith("digit_"):
+            digit = choice.split("_")[1]
             try:
                 num = int(digit)
                 if 1 <= num <= len(items):
@@ -112,11 +111,11 @@ def select_from_list(
     value_func: Callable[[Any], Any] = lambda x: x,
     description_func: Optional[Callable[[Any], str]] = None,
     allow_cancel: bool = True,
-    show_numbers: bool = False
+    show_numbers: bool = False,
 ) -> Optional[Any]:
     """
     Selecciona un item de una lista usando menú desplegable
-    
+
     Args:
         title: Título del menú
         items: Lista de items a mostrar
@@ -125,55 +124,47 @@ def select_from_list(
         description_func: Función opcional para describir el item
         allow_cancel: Permitir cancelar
         show_numbers: Mostrar números
-        
+
     Returns:
         Item seleccionado o None si se canceló
     """
     if not items:
         print(f"{Fore.YELLOW}⚠️  No hay elementos disponibles{Style.RESET_ALL}")
         return None
-    
+
     menu_items = []
     for item in items:
         text = display_func(item)
         value = value_func(item)
         description = description_func(item) if description_func else ""
         menu_items.append(MenuItem(text, value, description))
-    
+
     selected_item = show_dropdown_menu(
         title=title,
         items=menu_items,
         show_numbers=show_numbers,
         show_descriptions=bool(description_func),
-        allow_cancel=allow_cancel
+        allow_cancel=allow_cancel,
     )
-    
+
     return selected_item.value if selected_item else None
 
 
 def confirm_action(message: str, default: bool = False) -> bool:
     """
     Muestra un diálogo de confirmación simple
-    
+
     Args:
         message: Mensaje a mostrar
         default: Valor por defecto
-        
+
     Returns:
         True si confirma, False si cancela
     """
-    options = [
-        MenuItem("Sí", True, "Confirmar la acción"),
-        MenuItem("No", False, "Cancelar la acción")
-    ]
-    
-    result = show_dropdown_menu(
-        title=message,
-        items=options,
-        show_descriptions=True,
-        allow_cancel=True
-    )
-    
+    options = [MenuItem("Sí", True, "Confirmar la acción"), MenuItem("No", False, "Cancelar la acción")]
+
+    result = show_dropdown_menu(title=message, items=options, show_descriptions=True, allow_cancel=True)
+
     return result.value if result else False
 
 

@@ -1,37 +1,37 @@
-import sqlite3
-from typing import List, Dict, Any, Optional
-from datetime import datetime
 import os
+import sqlite3
+from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 
 class DatabaseConnection:
     def __init__(self, db_path: str = "data/biblioteca.db"):
         self.db_path = db_path
         self._ensure_directory()
-        
+
     def _ensure_directory(self):
         directory = os.path.dirname(self.db_path)
         if directory and not os.path.exists(directory):
             os.makedirs(directory)
-    
+
     def get_connection(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         return conn
-    
+
     def execute_query(self, query: str, params: tuple = ()) -> List[Dict[str, Any]]:
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(query, params)
             return [dict(row) for row in cursor.fetchall()]
-    
+
     def execute_non_query(self, query: str, params: tuple = ()) -> int:
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(query, params)
             conn.commit()
             return cursor.lastrowid or cursor.rowcount
-    
+
     def execute_script(self, script: str) -> None:
         with self.get_connection() as conn:
             conn.executescript(script)
@@ -40,7 +40,7 @@ class DatabaseConnection:
 class ORM:
     def __init__(self, db_connection: DatabaseConnection):
         self.db = db_connection
-    
+
     def create_tables(self):
         schema = """
         CREATE TABLE IF NOT EXISTS usuarios (
@@ -136,34 +136,34 @@ class ORM:
         CREATE INDEX IF NOT EXISTS idx_multas_usuario ON multas(usuario_id);
         CREATE INDEX IF NOT EXISTS idx_multas_empleado ON multas(empleado_id);
         """
-        
+
         self.db.execute_script(schema)
-    
+
     def insert(self, table: str, data: Dict[str, Any]) -> int:
         columns = list(data.keys())
-        placeholders = ', '.join(['?' for _ in columns])
+        placeholders = ", ".join(["?" for _ in columns])
         values = list(data.values())
-        
+
         query = f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({placeholders})"
         return self.db.execute_non_query(query, tuple(values))
-    
+
     def select(self, table: str, where: Optional[str] = None, params: tuple = ()) -> List[Dict[str, Any]]:
         query = f"SELECT * FROM {table}"
         if where:
             query += f" WHERE {where}"
-        
+
         return self.db.execute_query(query, params)
-    
+
     def update(self, table: str, data: Dict[str, Any], where: str, params: tuple = ()) -> int:
-        set_clause = ', '.join([f"{key} = ?" for key in data.keys()])
+        set_clause = ", ".join([f"{key} = ?" for key in data.keys()])
         values = list(data.values()) + list(params)
-        
+
         query = f"UPDATE {table} SET {set_clause} WHERE {where}"
         return self.db.execute_non_query(query, tuple(values))
-    
+
     def delete(self, table: str, where: str, params: tuple = ()) -> int:
         query = f"DELETE FROM {table} WHERE {where}"
         return self.db.execute_non_query(query, params)
-    
+
     def execute_custom_query(self, query: str, params: tuple = ()) -> List[Dict[str, Any]]:
         return self.db.execute_query(query, params)

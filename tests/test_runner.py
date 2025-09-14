@@ -3,44 +3,39 @@
 Runner principal para ejecutar todos los tests del sistema
 """
 
-import sys
 import os
-import unittest
+import sys
 import time
+import unittest
 from datetime import datetime
 
 # Agregar el path del proyecto
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 
 def run_tests():
     """Ejecuta todos los tests del sistema"""
-    
+
     print("🧪 EJECUTANDO TESTS DEL SISTEMA BIBLIOTECA LISKOV")
     print("=" * 60)
     print(f"📅 Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()
-    
+
     # Configurar el loader y suite
     loader = unittest.TestLoader()
     start_dir = os.path.dirname(__file__)
-    
+
     # Descubrir todos los tests
-    suite = loader.discover(start_dir, pattern='test_*.py')
-    
+    suite = loader.discover(start_dir, pattern="test_*.py")
+
     # Configurar el runner con verbosidad
-    runner = unittest.TextTestRunner(
-        verbosity=2,
-        stream=sys.stdout,
-        descriptions=True,
-        failfast=False
-    )
-    
+    runner = unittest.TextTestRunner(verbosity=2, stream=sys.stdout, descriptions=True, failfast=False)
+
     # Ejecutar tests
     start_time = time.time()
     result = runner.run(suite)
     end_time = time.time()
-    
+
     # Mostrar resumen
     print()
     print("📊 RESUMEN DE EJECUCIÓN")
@@ -50,7 +45,7 @@ def run_tests():
     print(f"❌ Fallos: {len(result.failures)}")
     print(f"💥 Errores: {len(result.errors)}")
     print(f"⏩ Omitidos: {len(result.skipped)}")
-    
+
     # Mostrar detalles de fallos si los hay
     if result.failures:
         print()
@@ -58,7 +53,7 @@ def run_tests():
         print("-" * 30)
         for test, traceback in result.failures:
             print(f"🔴 {test}: {traceback}")
-    
+
     # Mostrar detalles de errores si los hay
     if result.errors:
         print()
@@ -66,7 +61,7 @@ def run_tests():
         print("-" * 30)
         for test, traceback in result.errors:
             print(f"🔴 {test}: {traceback}")
-    
+
     # Resultado final
     if result.wasSuccessful():
         print()
@@ -82,13 +77,13 @@ def run_unit_tests_only():
     """Ejecuta solo los tests unitarios"""
     print("🧪 EJECUTANDO SOLO TESTS UNITARIOS")
     print("=" * 40)
-    
+
     loader = unittest.TestLoader()
-    unit_dir = os.path.join(os.path.dirname(__file__), 'unit')
-    
-    suite = loader.discover(unit_dir, pattern='test_*.py')
+    unit_dir = os.path.join(os.path.dirname(__file__), "unit")
+
+    suite = loader.discover(unit_dir, pattern="test_*.py")
     runner = unittest.TextTestRunner(verbosity=2)
-    
+
     result = runner.run(suite)
     return 0 if result.wasSuccessful() else 1
 
@@ -97,13 +92,13 @@ def run_integration_tests_only():
     """Ejecuta solo los tests de integración"""
     print("🧪 EJECUTANDO SOLO TESTS DE INTEGRACIÓN")
     print("=" * 40)
-    
+
     loader = unittest.TestLoader()
-    integration_dir = os.path.join(os.path.dirname(__file__), 'integration')
-    
-    suite = loader.discover(integration_dir, pattern='test_*.py')
+    integration_dir = os.path.join(os.path.dirname(__file__), "integration")
+
+    suite = loader.discover(integration_dir, pattern="test_*.py")
     runner = unittest.TextTestRunner(verbosity=2)
-    
+
     result = runner.run(suite)
     return 0 if result.wasSuccessful() else 1
 
@@ -112,21 +107,21 @@ def run_working_tests_only():
     """Ejecuta solo los tests que funcionan correctamente"""
     print("🧪 EJECUTANDO SOLO TESTS QUE FUNCIONAN")
     print("=" * 50)
-    
+
     loader = unittest.TestLoader()
-    unit_dir = os.path.join(os.path.dirname(__file__), 'unit')
-    
+    unit_dir = os.path.join(os.path.dirname(__file__), "unit")
+
     # Usar discover con patrones específicos para los tests que funcionan
     working_patterns = [
-        'test_*_service.py',
-        'test_all_repositories.py',
-        'test_empleado_repository.py', 
-        'test_usuario_repository.py',
-        'test_repositories_fixed.py'
+        "test_*_service.py",
+        "test_all_repositories.py",
+        "test_empleado_repository.py",
+        "test_usuario_repository.py",
+        "test_repositories_fixed.py",
     ]
-    
+
     suite = unittest.TestSuite()
-    
+
     for pattern in working_patterns:
         try:
             discovered_suite = loader.discover(unit_dir, pattern=pattern)
@@ -134,13 +129,9 @@ def run_working_tests_only():
         except Exception as e:
             print(f"⚠️  Error con patrón {pattern}: {e}")
             continue
-    
-    runner = unittest.TextTestRunner(
-        verbosity=2,
-        stream=sys.stdout,
-        descriptions=True
-    )
-    
+
+    runner = unittest.TextTestRunner(verbosity=2, stream=sys.stdout, descriptions=True)
+
     result = runner.run(suite)
     return 0 if result.wasSuccessful() else 1
 
@@ -149,10 +140,10 @@ def show_test_coverage():
     """Muestra información sobre la cobertura de tests"""
     print("📋 COBERTURA DE TESTS")
     print("=" * 30)
-    
+
     unit_tests = [
         "✅ UsuarioService - Registro, búsqueda, validaciones",
-        "✅ ItemBibliotecaService - CRUD, búsquedas, categorías", 
+        "✅ ItemBibliotecaService - CRUD, búsquedas, categorías",
         "✅ PrestamoService - Préstamos, devoluciones, multas",
         "✅ ReservaService - Reservas, cancelaciones",
         "✅ MultaService - Pagos, listados",
@@ -162,47 +153,47 @@ def show_test_coverage():
         "✅ PrestamoRepository - Gestión préstamos, consultas",
         "✅ ReservaRepository - CRUD reservas, estados",
         "✅ MultaRepository - Gestión multas, pagos",
-        "✅ EmpleadoRepository - CRUD empleados, autenticación"
+        "✅ EmpleadoRepository - CRUD empleados, autenticación",
     ]
-    
+
     integration_tests = [
         "✅ Flujo completo préstamo con multa",
         "✅ Sistema de reservas end-to-end",
         "✅ Búsquedas y filtros integrados",
         "✅ Autenticación completa",
-        "✅ Validaciones y restricciones"
+        "✅ Validaciones y restricciones",
     ]
-    
+
     print("🔧 TESTS UNITARIOS:")
     for test in unit_tests:
         print(f"  {test}")
-    
+
     print()
     print("🔄 TESTS DE INTEGRACIÓN:")
     for test in integration_tests:
         print(f"  {test}")
-    
+
     print()
     print("📊 ESTADÍSTICAS:")
     print(f"  • {len(unit_tests)} suites de tests unitarios")
-    print(f"  • {len(integration_tests)} suites de tests de integración") 
+    print(f"  • {len(integration_tests)} suites de tests de integración")
     print(f"  • ~100+ casos de prueba individuales")
     print(f"  • Cobertura COMPLETA: Todos los servicios y repositorios")
     print(f"  • Tests para: CRUD, validaciones, reglas de negocio, errores")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) > 1:
-        if sys.argv[1] == '--unit':
+        if sys.argv[1] == "--unit":
             sys.exit(run_unit_tests_only())
-        elif sys.argv[1] == '--integration':
+        elif sys.argv[1] == "--integration":
             sys.exit(run_integration_tests_only())
-        elif sys.argv[1] == '--working-only':
+        elif sys.argv[1] == "--working-only":
             sys.exit(run_working_tests_only())
-        elif sys.argv[1] == '--coverage':
+        elif sys.argv[1] == "--coverage":
             show_test_coverage()
             sys.exit(0)
-        elif sys.argv[1] == '--help':
+        elif sys.argv[1] == "--help":
             print("🧪 RUNNER DE TESTS - Sistema Biblioteca Liskov")
             print()
             print("Uso:")
@@ -213,6 +204,6 @@ if __name__ == '__main__':
             print("  python test_runner.py --coverage    # Mostrar cobertura")
             print("  python test_runner.py --help        # Esta ayuda")
             sys.exit(0)
-    
+
     # Ejecutar todos los tests por defecto
     sys.exit(run_tests())

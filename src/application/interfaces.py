@@ -2,11 +2,20 @@
 Repository interfaces defining contracts for data access
 Following the Dependency Inversion Principle - high-level modules depend on abstractions
 """
+
 from abc import ABC, abstractmethod
 from typing import List, Optional
+
 from ..domain.entities import (
-    Usuario, ItemBiblioteca, Prestamo, Reserva, Multa, Empleado,
-    TipoUsuario, EstadoItem, CategoriaItem
+    CategoriaItem,
+    Empleado,
+    EstadoItem,
+    ItemBiblioteca,
+    Multa,
+    Prestamo,
+    Reserva,
+    TipoUsuario,
+    Usuario,
 )
 
 
