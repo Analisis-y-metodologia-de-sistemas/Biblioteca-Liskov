@@ -20,7 +20,7 @@ def main():
     python_cmd = "python3" if os.name != "nt" else "python"
 
     # Lista de tests que funcionan correctamente
-    working_tests = [
+    _ = [
         # Todos los servicios
         "tests/unit/test_*_service.py",
         # Repositorios básicos que funcionan
@@ -33,10 +33,10 @@ def main():
 
     print("🚀 Ejecutando SOLO tests que funcionan correctamente...")
     print("=" * 60)
-    print(f"📊 Tests incluidos:")
-    print(f"  ✅ Servicios: AuthService, UsuarioService, ItemService, PrestamoService, ReservaService, MultaService")
-    print(f"  ✅ Repositorios básicos: Usuario, Empleado, Operaciones generales")
-    print(f"  ✅ Repositorios complejos: Préstamos, Reservas, Multas, Items (versión corregida)")
+    print("📊 Tests incluidos:")
+    print("  ✅ Servicios: AuthService, UsuarioService, ItemService, PrestamoService, ReservaService, MultaService")
+    print("  ✅ Repositorios básicos: Usuario, Empleado, Operaciones generales")
+    print("  ✅ Repositorios complejos: Préstamos, Reservas, Multas, Items (versión corregida)")
     print()
 
     try:

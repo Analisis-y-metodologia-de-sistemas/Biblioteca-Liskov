@@ -6,8 +6,8 @@ Tests simplificados para todos los repositorios
 import os
 import sys
 import unittest
-from datetime import date, datetime
-from unittest.mock import MagicMock, Mock
+from datetime import datetime
+from unittest.mock import Mock
 
 # Agregar el path del proyecto
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -15,7 +15,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from src.domain.entities import (
     CategoriaItem,
     Empleado,
-    EstadoItem,
     ItemBiblioteca,
     Multa,
     Prestamo,

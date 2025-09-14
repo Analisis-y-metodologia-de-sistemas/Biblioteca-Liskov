@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 from src.domain.entities import Empleado
 from src.infrastructure.database import ORM

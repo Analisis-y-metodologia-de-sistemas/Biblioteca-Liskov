@@ -400,8 +400,6 @@ class MultaRepository(IMultaRepository):
         return self.listar_no_pagadas()
 
     def marcar_como_pagada(self, id: int, fecha_pago):
-        from datetime import date
-
         self.orm.update(self.table, {"pagada": True, "fecha_pago": fecha_pago.isoformat()}, "id = ?", (id,))
 
     def listar_todas(self) -> List[Multa]:

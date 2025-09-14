@@ -4,7 +4,6 @@ Value Objects for the Library Domain
 
 import re
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass(frozen=True)

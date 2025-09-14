@@ -1,10 +1,9 @@
 import sys
 from datetime import datetime
-from typing import List, Optional
 
 from ..application.auth_service import AuthService
 from ..application.services import ItemBibliotecaService, MultaService, PrestamoService, ReservaService, UsuarioService
-from ..domain.entities import CategoriaItem, ItemBiblioteca, TipoUsuario, Usuario
+from ..domain.entities import CategoriaItem, TipoUsuario
 from ..shared.logger import get_logger
 from ..shared.menu_utils import (
     MenuItem,
@@ -231,7 +230,9 @@ class ConsoleUI:
                 items=items,
                 display_func=lambda i: f"[{i.id}] {i.titulo}",
                 value_func=lambda i: i,
-                description_func=lambda i: f"Estado: {i.estado.value} - Autor: {i.autor or 'N/A'} - Categoría: {i.categoria.value}",
+                description_func=lambda i: (
+                    f"Estado: {i.estado.value} - Autor: {i.autor or 'N/A'} - Categoría: {i.categoria.value}"
+                ),
                 allow_cancel=True,
             )
 
@@ -244,7 +245,8 @@ class ConsoleUI:
 
             # Confirmar préstamo
             if not confirm_action(
-                f"¿Confirmar préstamo de '{item_seleccionado.titulo}' a {usuario_seleccionado.nombre} por {dias_prestamo} días?",
+                (f"¿Confirmar préstamo de '{item_seleccionado.titulo}' "
+                 f"a {usuario_seleccionado.nombre} por {dias_prestamo} días?"),
                 default=True,
             ):
                 show_warning("Préstamo cancelado")
@@ -286,7 +288,9 @@ class ConsoleUI:
                 items=usuarios,
                 display_func=lambda u: f"{u.nombre} {u.apellido} ({u.email})",
                 value_func=lambda u: u,
-                description_func=lambda u: f"Tipo: {u.tipo.value} - Estado: {'Activo' if u.activo else 'Inactivo'} - ID: {u.numero_identificacion}",
+                description_func=lambda u: (
+                    f"Tipo: {u.tipo.value} - Estado: {'Activo' if u.activo else 'Inactivo'} - ID: {u.numero_identificacion}"
+                ),
                 allow_cancel=True,
                 show_numbers=False,
             )
@@ -311,7 +315,9 @@ class ConsoleUI:
                 items=items,
                 display_func=lambda i: f"[{i.id}] {i.titulo}",
                 value_func=lambda i: i,
-                description_func=lambda i: f"Autor: {i.autor or 'N/A'} - Categoría: {i.categoria.value} - Ubicación: {i.ubicacion or 'N/A'}",
+                description_func=lambda i: (
+                    f"Autor: {i.autor or 'N/A'} - Categoría: {i.categoria.value} - Ubicación: {i.ubicacion or 'N/A'}"
+                ),
                 allow_cancel=True,
                 show_numbers=False,
             )
@@ -454,7 +460,9 @@ class ConsoleUI:
                         items=items,
                         display_func=lambda i: f"[{i.id}] {i.titulo}",
                         value_func=lambda i: i,
-                        description_func=lambda i: f"Estado: {i.estado.value} - Autor: {i.autor or 'N/A'} - Categoría: {i.categoria.value}",
+                        description_func=lambda i: (
+                            f"Estado: {i.estado.value} - Autor: {i.autor or 'N/A'} - Categoría: {i.categoria.value}"
+                        ),
                         allow_cancel=True,
                     )
                     if item_seleccionado:
@@ -507,7 +515,9 @@ class ConsoleUI:
                         items=prestamos,
                         display_func=lambda p: f"Préstamo #{p.id} - Usuario: {p.usuario_id}",
                         value_func=lambda p: p,
-                        description_func=lambda p: f"Item: {p.item_id} - Vence: {p.fecha_devolucion_esperada.strftime('%d/%m/%Y')}",
+                        description_func=lambda p: (
+                            f"Item: {p.item_id} - Vence: {p.fecha_devolucion_esperada.strftime('%d/%m/%Y')}"
+                        ),
                         allow_cancel=True,
                     )
                     if prestamo_seleccionado:
@@ -862,7 +872,7 @@ class ConsoleUI:
                 return
 
             if confirm_action(f"¿Confirmar cancelación de la reserva #{reserva_seleccionada.id}?", default=False):
-                reserva_actualizada = self.reserva_service.cancelar_reserva(reserva_seleccionada.id)
+                self.reserva_service.cancelar_reserva(reserva_seleccionada.id)
 
                 show_success("Reserva cancelada exitosamente")
                 self.logger.info(f"Reserva cancelada: {reserva_seleccionada.id}")
@@ -1048,7 +1058,7 @@ class ConsoleUI:
         try:
             empleado_actual = self.auth_service.get_empleado_actual()
 
-            print(f"\\n🔍 AUDITORÍA DE OPERACIONES")
+            print("\\n🔍 AUDITORÍA DE OPERACIONES")
             print("=" * 50)
             print(f"👔 Empleado actual: {empleado_actual.nombre} {empleado_actual.apellido}")
             print(f"🏢 Cargo: {empleado_actual.cargo}")
@@ -1120,7 +1130,8 @@ class ConsoleUI:
                         MenuItem(
                             f"[{item.id}] {item.titulo}",
                             item,
-                            f"{emoji} {item.estado.value.capitalize()} | Autor: {item.autor or 'N/A'} | Ubicación: {item.ubicacion or 'N/A'}",
+                            (f"{emoji} {item.estado.value.capitalize()} | Autor: {item.autor or 'N/A'} | "
+                             f"Ubicación: {item.ubicacion or 'N/A'}"),
                         )
                     )
 
@@ -1148,7 +1159,7 @@ class ConsoleUI:
             estado_emoji = {"disponible": "✅", "prestado": "📤", "en_reparacion": "🔧", "perdido": "❌"}
             emoji = estado_emoji.get(item.estado.value, "❓")
 
-            print(f"\\n📖 DETALLES DEL ITEM")
+            print("\\n📖 DETALLES DEL ITEM")
             print("=" * 60)
             print(f"🆔 ID: {item.id}")
             print(f"📚 Título: {item.titulo}")
@@ -1157,9 +1168,8 @@ class ConsoleUI:
             print(f"📖 ISBN: {item.isbn or 'No especificado'}")
             print(f"📊 Estado: {emoji} {item.estado.value.capitalize()}")
             print(f"📍 Ubicación: {item.ubicacion or 'No especificada'}")
-            print(
-                f"📅 Fecha adquisición: {item.fecha_adquisicion.strftime('%d/%m/%Y') if item.fecha_adquisicion else 'No registrada'}"
-            )
+            print(f"📅 Fecha adquisición: "
+                  f"{item.fecha_adquisicion.strftime('%d/%m/%Y') if item.fecha_adquisicion else 'No registrada'}")
 
             if item.descripcion:
                 print(f"📝 Descripción: {item.descripcion}")

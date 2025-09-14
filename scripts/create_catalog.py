@@ -9,8 +9,6 @@ import sys
 # Agregar el path del proyecto al sistema
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from datetime import datetime
-
 from src.container import Container
 
 
@@ -353,7 +351,7 @@ def main():
                     else:
                         print(f"❌ Error: {datos['titulo']} - {str(e)}")
 
-        print(f"\\n🎉 CATÁLOGO CREADO EXITOSAMENTE!")
+        print("\\n🎉 CATÁLOGO CREADO EXITOSAMENTE!")
         print("=" * 50)
         print(f"📊 Total de items creados: {items_creados}")
         print("\\n📋 Items por categoría:")

@@ -1,4 +1,3 @@
-import os
 import sys
 from typing import Any, Callable, List, Optional
 
@@ -96,7 +95,7 @@ def show_dropdown_menu(
         # Mostrar instrucciones
         instructions = f"{Fore.YELLOW}Ingrese el número de la opción"
         if allow_cancel:
-            instructions += f" | 'q' para cancelar"
+            instructions += " | 'q' para cancelar"
         print(instructions + Style.RESET_ALL)
 
         print()  # Línea en blanco

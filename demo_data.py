@@ -89,8 +89,8 @@ def cargar_datos_demo():
             except Exception as e:
                 print(f"  ❌ {titulo}: {str(e)}")
 
-        print(f"\n🎉 ¡Datos de demostración cargados exitosamente!")
-        print(f"📊 Estadísticas:")
+        print("\n🎉 ¡Datos de demostración cargados exitosamente!")
+        print("📊 Estadísticas:")
         usuarios_total = len(usuario_service.listar_usuarios())
         items_total = len(item_service.listar_disponibles())
         print(f"  👤 Usuarios: {usuarios_total}")

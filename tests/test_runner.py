@@ -177,9 +177,9 @@ def show_test_coverage():
     print("📊 ESTADÍSTICAS:")
     print(f"  • {len(unit_tests)} suites de tests unitarios")
     print(f"  • {len(integration_tests)} suites de tests de integración")
-    print(f"  • ~100+ casos de prueba individuales")
-    print(f"  • Cobertura COMPLETA: Todos los servicios y repositorios")
-    print(f"  • Tests para: CRUD, validaciones, reglas de negocio, errores")
+    print("  • ~100+ casos de prueba individuales")
+    print("  • Cobertura COMPLETA: Todos los servicios y repositorios")
+    print("  • Tests para: CRUD, validaciones, reglas de negocio, errores")
 
 
 if __name__ == "__main__":

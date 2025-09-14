@@ -3,7 +3,6 @@ from typing import List, Optional
 
 from ..domain.entities import (
     CategoriaItem,
-    Empleado,
     EstadoItem,
     ItemBiblioteca,
     Multa,
@@ -13,7 +12,6 @@ from ..domain.entities import (
     Usuario,
 )
 from .interfaces import (
-    IEmpleadoRepository,
     IItemBibliotecaRepository,
     IMultaRepository,
     IPrestamoRepository,

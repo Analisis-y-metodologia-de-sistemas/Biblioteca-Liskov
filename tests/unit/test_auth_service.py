@@ -6,15 +6,14 @@ Tests unitarios para AuthService
 import os
 import sys
 import unittest
-from datetime import datetime
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 # Agregar el path del proyecto
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from src.application.auth_service import AuthService
 from src.application.interfaces import IEmpleadoRepository
-from src.domain.entities import Empleado, SesionEmpleado
+from src.domain.entities import Empleado
 
 
 class TestAuthService(unittest.TestCase):

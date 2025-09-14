@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import List, Optional
 
-from .value_objects import ISBN, Email, Money
+from .value_objects import Email
 
 
 class TipoUsuario(Enum):

@@ -9,8 +9,6 @@ import sys
 # Agregar el path del proyecto al sistema
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from datetime import datetime
-
 from src.container import Container
 
 
@@ -23,9 +21,6 @@ def main():
         # Servicios
         usuario_service = container.get_usuario_service()
         item_service = container.get_item_service()
-        prestamo_service = container.get_prestamo_service()
-        reserva_service = container.get_reserva_service()
-        auth_service = container.get_auth_service()
 
         print("\n📋 Creando usuarios de prueba...")
 
@@ -112,10 +107,6 @@ def main():
 
         for datos in items_prueba:
             try:
-                from src.domain.entities import CategoriaItem
-
-                categoria_enum = CategoriaItem(datos["categoria"])
-
                 item = item_service.agregar_item(
                     titulo=datos["titulo"],
                     autor=datos["autor"],
@@ -136,13 +127,13 @@ def main():
         usuarios = usuario_service.listar_usuarios()
         items = item_service.listar_disponibles()
 
-        print(f"\n📊 RESUMEN:")
+        print("\n📊 RESUMEN:")
         print(f"👥 Usuarios registrados: {len(usuarios)}")
         print(f"📚 Items disponibles: {len(items)}")
-        print(f"\n💡 Use las credenciales de empleado para probar el sistema:")
-        print(f"   Usuario: arodriguez | Contraseña: 1234")
-        print(f"   Usuario: cmartinez  | Contraseña: 1234")
-        print(f"   Usuario: mlopez     | Contraseña: 1234")
+        print("\n💡 Use las credenciales de empleado para probar el sistema:")
+        print("   Usuario: arodriguez | Contraseña: 1234")
+        print("   Usuario: cmartinez  | Contraseña: 1234")
+        print("   Usuario: mlopez     | Contraseña: 1234")
 
     except Exception as e:
         print(f"❌ Error crítico: {str(e)}")
