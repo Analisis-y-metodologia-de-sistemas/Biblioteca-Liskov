@@ -273,7 +273,7 @@ class IEmpleadoRepository(ABC):
         pass
 
     @abstractmethod
-    def obtener_por_usuario(self, usuario_sistema: str) -> Optional[Empleado]:
+    def obtener_por_usuario_sistema(self, usuario_sistema: str) -> Optional[Empleado]:
         """Get employee by system username"""
         pass
 

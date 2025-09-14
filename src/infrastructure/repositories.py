@@ -158,6 +158,11 @@ class ItemBibliotecaRepository(IItemBibliotecaRepository):
         rows = self.orm.select(self.table, "estado = ?", (estado.value,))
         return [self._row_to_entity(row) for row in rows]
 
+    def buscar_por_categoria(self, categoria: CategoriaItem) -> List[ItemBiblioteca]:
+        """Get items by category using enum"""
+        rows = self.orm.select(self.table, "categoria = ?", (categoria.value,))
+        return [self._row_to_entity(row) for row in rows]
+
     def listar_todos(self) -> List[ItemBiblioteca]:
         rows = self.orm.select(self.table)
         return [self._row_to_entity(row) for row in rows]
@@ -463,14 +468,10 @@ class EmpleadoRepository(IEmpleadoRepository):
         rows = self.orm.select(self.table, "id = ?", (id,))
         return self._row_to_entity(rows[0]) if rows else None
 
-    def obtener_por_usuario(self, usuario_sistema: str) -> Optional[Empleado]:
+    def obtener_por_usuario_sistema(self, usuario_sistema: str) -> Optional[Empleado]:
         """Get employee by system username"""
         rows = self.orm.select(self.table, "usuario_sistema = ?", (usuario_sistema,))
         return self._row_to_entity(rows[0]) if rows else None
-
-    def obtener_por_usuario_sistema(self, usuario: str) -> Optional[Empleado]:
-        """Legacy method - use obtener_por_usuario instead"""
-        return self.obtener_por_usuario(usuario)
 
     def listar_todos(self) -> List[Empleado]:
         rows = self.orm.select(self.table)

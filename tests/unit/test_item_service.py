@@ -139,7 +139,7 @@ class TestItemBibliotecaService(unittest.TestCase):
 
         # Assert
         self.assertEqual(resultado, items_esperados)
-        self.mock_repo.listar_por_categoria.assert_called_once_with("revista")
+        self.mock_repo.listar_por_categoria.assert_called_once_with(CategoriaItem.REVISTA)
 
     def test_listar_disponibles(self):
         """Test: Listar solo items disponibles"""

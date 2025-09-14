@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import List, Optional
 
-from ..domain.entities import Empleado, EstadoItem, ItemBiblioteca, Multa, Prestamo, Reserva, TipoUsuario, Usuario
+from ..domain.entities import CategoriaItem, Empleado, EstadoItem, ItemBiblioteca, Multa, Prestamo, Reserva, TipoUsuario, Usuario
 from .interfaces import (
     IEmpleadoRepository,
     IItemBibliotecaRepository,
@@ -89,7 +89,8 @@ class ItemBibliotecaService:
         return self.item_repo.buscar_por_autor(autor)
 
     def listar_por_categoria(self, categoria: str) -> List[ItemBiblioteca]:
-        return self.item_repo.listar_por_categoria(categoria)
+        categoria_enum = CategoriaItem(categoria) if isinstance(categoria, str) else categoria
+        return self.item_repo.listar_por_categoria(categoria_enum)
 
     def listar_disponibles(self) -> List[ItemBiblioteca]:
         items = self.item_repo.listar_todos()
