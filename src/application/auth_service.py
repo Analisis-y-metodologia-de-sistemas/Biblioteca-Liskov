@@ -1,9 +1,10 @@
 import hashlib
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
 from ..domain.entities import Empleado, SesionEmpleado
-from .interfaces import IEmpleadoRepository
 from ..shared.logger import get_logger
+from .interfaces import IEmpleadoRepository
 
 
 class AuthService:
@@ -23,39 +24,35 @@ class AuthService:
     def login(self, usuario_sistema: str, password: str) -> bool:
         """
         Autentica un empleado
-        
+
         Args:
             usuario_sistema: Nombre de usuario del sistema
             password: Contraseña en texto plano
-            
+
         Returns:
             True si la autenticación es exitosa
         """
         try:
             empleado = self.empleado_repo.obtener_por_usuario_sistema(usuario_sistema)
-            
+
             if not empleado:
                 self.logger.warning(f"Intento de login fallido: usuario '{usuario_sistema}' no encontrado")
                 return False
-            
+
             if not empleado.activo:
                 self.logger.warning(f"Intento de login con usuario inactivo: '{usuario_sistema}'")
                 return False
-            
+
             if not self.verificar_password(password, empleado.password_hash):
                 self.logger.warning(f"Intento de login fallido: contraseña incorrecta para '{usuario_sistema}'")
                 return False
-            
+
             # Login exitoso
-            self._sesion_actual = SesionEmpleado(
-                empleado=empleado,
-                fecha_login=datetime.now(),
-                activa=True
-            )
-            
+            self._sesion_actual = SesionEmpleado(empleado=empleado, fecha_login=datetime.now(), activa=True)
+
             self.logger.info(f"Login exitoso: {empleado.nombre} {empleado.apellido} ({usuario_sistema})")
             return True
-            
+
         except Exception as e:
             self.logger.error(f"Error durante login: {str(e)}")
             return False
@@ -81,12 +78,19 @@ class AuthService:
         """Verifica si hay un empleado logueado"""
         return self._sesion_actual is not None and self._sesion_actual.activa
 
-    def crear_empleado(self, nombre: str, apellido: str, email: str, 
-                      usuario_sistema: str, password: str, cargo: str = "Bibliotecario",
-                      turno: str = "") -> Empleado:
+    def crear_empleado(
+        self,
+        nombre: str,
+        apellido: str,
+        email: str,
+        usuario_sistema: str,
+        password: str,
+        cargo: str = "Bibliotecario",
+        turno: str = "",
+    ) -> Empleado:
         """
         Crea un nuevo empleado
-        
+
         Args:
             nombre: Nombre del empleado
             apellido: Apellido del empleado
@@ -95,10 +99,10 @@ class AuthService:
             password: Contraseña en texto plano
             cargo: Cargo del empleado
             turno: Turno de trabajo
-            
+
         Returns:
             Empleado creado
-            
+
         Raises:
             ValueError: Si el usuario del sistema ya existe
         """
@@ -106,7 +110,7 @@ class AuthService:
         empleado_existente = self.empleado_repo.obtener_por_usuario_sistema(usuario_sistema)
         if empleado_existente:
             raise ValueError(f"El usuario del sistema '{usuario_sistema}' ya existe")
-        
+
         empleado = Empleado(
             nombre=nombre,
             apellido=apellido,
@@ -115,12 +119,12 @@ class AuthService:
             password_hash=self.hash_password(password),
             cargo=cargo,
             turno=turno,
-            fecha_registro=datetime.now()
+            fecha_registro=datetime.now(),
         )
-        
+
         empleado_creado = self.empleado_repo.crear(empleado)
         self.logger.info(f"Empleado creado: {nombre} {apellido} ({usuario_sistema})")
-        
+
         return empleado_creado
 
     def listar_empleados_activos(self) -> list[Empleado]:
@@ -130,12 +134,12 @@ class AuthService:
     def cambiar_password(self, empleado_id: int, password_actual: str, password_nuevo: str) -> bool:
         """
         Cambia la contraseña de un empleado
-        
+
         Args:
             empleado_id: ID del empleado
             password_actual: Contraseña actual
             password_nuevo: Nueva contraseña
-            
+
         Returns:
             True si el cambio fue exitoso
         """
@@ -143,18 +147,18 @@ class AuthService:
             empleado = self.empleado_repo.obtener_por_id(empleado_id)
             if not empleado:
                 return False
-            
+
             # Verificar contraseña actual
             if not self.verificar_password(password_actual, empleado.password_hash):
                 return False
-            
+
             # Actualizar contraseña
             empleado.password_hash = self.hash_password(password_nuevo)
             self.empleado_repo.actualizar(empleado)
-            
+
             self.logger.info(f"Contraseña cambiada para empleado: {empleado.nombre} {empleado.apellido}")
             return True
-            
+
         except Exception as e:
             self.logger.error(f"Error al cambiar contraseña: {str(e)}")
             return False

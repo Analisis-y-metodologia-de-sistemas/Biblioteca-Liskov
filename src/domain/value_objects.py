@@ -1,14 +1,15 @@
 """
 Value Objects for the Library Domain
 """
-from dataclasses import dataclass
-from typing import Optional
+
 import re
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
 class Email:
     """Value object for email addresses"""
+
     value: str
 
     def __post_init__(self):
@@ -16,7 +17,7 @@ class Email:
             raise ValueError(f"Invalid email format: {self.value}")
 
     def _is_valid_email(self, email: str) -> bool:
-        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return bool(re.match(pattern, email))
 
     def __str__(self) -> str:
@@ -26,6 +27,7 @@ class Email:
 @dataclass(frozen=True)
 class Money:
     """Value object for monetary amounts"""
+
     amount: float
     currency: str = "ARS"
 
@@ -38,12 +40,12 @@ class Money:
     def __str__(self) -> str:
         return f"{self.currency} {self.amount:.2f}"
 
-    def __add__(self, other: 'Money') -> 'Money':
+    def __add__(self, other: "Money") -> "Money":
         if self.currency != other.currency:
             raise ValueError("Cannot add money with different currencies")
         return Money(self.amount + other.amount, self.currency)
 
-    def __sub__(self, other: 'Money') -> 'Money':
+    def __sub__(self, other: "Money") -> "Money":
         if self.currency != other.currency:
             raise ValueError("Cannot subtract money with different currencies")
         return Money(self.amount - other.amount, self.currency)
@@ -52,6 +54,7 @@ class Money:
 @dataclass(frozen=True)
 class ISBN:
     """Value object for ISBN codes"""
+
     value: str
 
     def __post_init__(self):
@@ -60,7 +63,7 @@ class ISBN:
 
     def _is_valid_isbn(self, isbn: str) -> bool:
         # Simplified ISBN validation - accepts ISBN-10 and ISBN-13
-        cleaned = isbn.replace('-', '').replace(' ', '')
+        cleaned = isbn.replace("-", "").replace(" ", "")
         return len(cleaned) in [10, 13] and cleaned.isdigit()
 
     def __str__(self) -> str:

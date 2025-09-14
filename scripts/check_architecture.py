@@ -13,7 +13,6 @@ Usage:
 """
 
 import ast
-import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Set
@@ -90,7 +89,6 @@ def check_dependencies() -> bool:
         return False
 
     violations = []
-    all_good = True
 
     # Define allowed dependencies for each layer
     allowed_deps = {
@@ -121,7 +119,6 @@ def check_dependencies() -> bool:
                     for dep in deps:
                         violation = f"❌ {relative_path}: {layer} layer imports from {dep_layer} layer ({dep})"
                         violations.append(violation)
-                        all_good = False
 
     # Report results
     if violations:

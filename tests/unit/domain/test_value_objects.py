@@ -1,8 +1,10 @@
 """
 Tests for domain value objects
 """
+
 import pytest
-from src.domain.value_objects import Email, Money, ISBN
+
+from src.domain.value_objects import ISBN, Email, Money
 
 
 class TestEmail:

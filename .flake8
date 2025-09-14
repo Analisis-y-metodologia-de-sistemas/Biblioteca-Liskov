@@ -1,0 +1,13 @@
+[flake8]
+max-line-length = 127
+max-complexity = 10
+select = E,W,F,C90
+ignore = E203,E501,W503,C901
+exclude = .git,__pycache__,build,dist,.venv,venv,.tox,.eggs
+per-file-ignores =
+    __init__.py:F401
+    tests/*:F401,F811,E402
+    demo_data.py:E402
+    main.py:E402
+    test_navigation.py:E402
+    scripts/*:E402
