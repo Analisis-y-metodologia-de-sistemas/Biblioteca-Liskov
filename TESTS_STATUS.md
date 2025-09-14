@@ -3,7 +3,10 @@
 ## ✅ Tests que Funcionan Correctamente
 
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/master
 ### Servicios (52 tests) - 100% ✅
 - **AuthService** (14 tests) - Login, logout, gestión de empleados, passwords
 - **UsuarioService** (6 tests) - Registro, búsqueda, actualización de usuarios
