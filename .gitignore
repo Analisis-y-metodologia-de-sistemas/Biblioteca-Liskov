@@ -274,3 +274,50 @@ temp/
 # Documentation builds
 docs/build/
 site/
+
+# Project specific files
+# Database files
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+biblioteca.db
+biblioteca_test.db
+
+# Security reports
+bandit-report.json
+bandit-pr-report.json
+safety-report.json
+
+# Test artifacts
+.coverage.*
+htmlcov/
+coverage.json
+
+# Development artifacts
+.claude/
+*.pid
+
+# Backup files
+*.backup
+*~.nib
+local.properties
+
+# Project logs
+logs/
+*.log
+
+# IDE specific
+.vscode/settings.json
+.vscode/launch.json
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/usage.statistics.xml
+.idea/dictionaries
+.idea/shelf
+
+# OS specific
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
