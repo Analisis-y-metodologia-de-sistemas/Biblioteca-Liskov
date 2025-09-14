@@ -210,5 +210,9 @@ exclude = [
 ]
 per-file-ignores = [
     "__init__.py:F401",
-    "tests/*:F401,F811",
+    "tests/*:F401,F811,E402",
+    "demo_data.py:E402",
+    "main.py:E402",
+    "test_navigation.py:E402",
+    "scripts/*:E402",
 ]
