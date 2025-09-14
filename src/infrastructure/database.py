@@ -41,10 +41,7 @@ class ORM:
     def __init__(self, db_connection: DatabaseConnection):
         self.db = db_connection
         # Whitelist of allowed table names for security
-        self._allowed_tables = {
-            'usuarios', 'items_biblioteca', 'empleados',
-            'prestamos', 'reservas', 'multas'
-        }
+        self._allowed_tables = {"usuarios", "items_biblioteca", "empleados", "prestamos", "reservas", "multas"}
 
     def _validate_table_name(self, table: str) -> None:
         """Validate table name against whitelist to prevent SQL injection."""
@@ -56,7 +53,7 @@ class ORM:
         sanitized = []
         for col in columns:
             # Only allow alphanumeric characters and underscores
-            if not col.replace('_', '').isalnum():
+            if not col.replace("_", "").isalnum():
                 raise ValueError(f"Invalid column name: {col}")
             sanitized.append(col)
         return sanitized
