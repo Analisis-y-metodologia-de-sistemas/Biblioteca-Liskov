@@ -1,0 +1,220 @@
+name: 🔍 PR Quality Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for better diff analysis
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: 📦 Install quality tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        # Install development dependencies from pyproject.toml
+        pip install -e ".[dev]"
+
+    - name: 📊 PR Size Analysis
+      run: |
+        echo "📊 Analyzing PR size and complexity..."
+        CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | wc -l)
+        ADDED_LINES=$(git diff --numstat origin/${{ github.base_ref }}...HEAD | awk '{sum+=$1} END {print sum+0}')
+        REMOVED_LINES=$(git diff --numstat origin/${{ github.base_ref }}...HEAD | awk '{sum+=$2} END {print sum+0}')
+
+        echo "📁 Files changed: $CHANGED_FILES"
+        echo "➕ Lines added: $ADDED_LINES"
+        echo "➖ Lines removed: $REMOVED_LINES"
+
+        # Warning for large PRs
+        if [ "$CHANGED_FILES" -gt 20 ]; then
+          echo "⚠️ Large PR detected: $CHANGED_FILES files changed"
+          echo "Consider breaking this into smaller PRs for better review"
+        fi
+
+        if [ "$ADDED_LINES" -gt 500 ]; then
+          echo "⚠️ Large PR detected: $ADDED_LINES lines added"
+          echo "Consider breaking this into smaller PRs"
+        fi
+
+    - name: 🎯 Code Quality Analysis
+      run: |
+        echo "🎯 Running comprehensive code quality checks..."
+
+        # Get list of changed Python files
+        CHANGED_PY_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.py$' | tr '\n' ' ')
+
+        if [ -n "$CHANGED_PY_FILES" ]; then
+          echo "🔍 Analyzing changed Python files: $CHANGED_PY_FILES"
+
+          # Run quality checks only on changed files
+          echo "Running flake8 on changed files..."
+          flake8 $CHANGED_PY_FILES --statistics
+
+          echo "Running pylint on changed files..."
+          pylint $CHANGED_PY_FILES --output-format=text --reports=y --score=y || true
+
+          echo "Running complexity analysis..."
+          python -m complexity_report $CHANGED_PY_FILES || true
+        else
+          echo "No Python files changed in this PR"
+        fi
+
+    - name: 🧪 Test Coverage Analysis
+      run: |
+        echo "🧪 Analyzing test coverage for PR changes..."
+
+        # Run tests with coverage for the entire codebase
+        python -m pytest tests/ --cov=src --cov-report=json --cov-report=term-missing --tb=short
+
+        # Check if coverage meets minimum threshold
+        COVERAGE=$(python -c "
+        import json
+        with open('coverage.json') as f:
+            data = json.load(f)
+        print(f\"{data['totals']['percent_covered']:.1f}\")
+        " 2>/dev/null || echo "0")
+
+        echo "📊 Current test coverage: $COVERAGE%"
+
+        if (( $(echo "$COVERAGE < 40" | bc -l) )); then
+          echo "❌ Coverage below 40% threshold"
+          exit 1
+        else
+          echo "✅ Coverage meets 40% threshold"
+        fi
+      env:
+        PYTHONPATH: ${{ github.workspace }}
+
+    - name: 🔒 Security Scan
+      run: |
+        echo "🔒 Running security analysis on PR changes..."
+
+        # Security scan on all source code
+        bandit -r src/ -f json -o bandit-pr-report.json -l
+        bandit -r src/ -l
+
+        # Check for secrets in the diff
+        echo "Checking for potential secrets in changes..."
+        git diff origin/${{ github.base_ref }}...HEAD | grep -i -E "(password|secret|key|token|api)" || echo "No obvious secrets found"
+
+    - name: 🎨 Code Style Enforcement
+      run: |
+        echo "🎨 Enforcing code style standards..."
+
+        # Check code formatting
+        black --check --diff src/ tests/ || {
+          echo "❌ Code formatting issues found"
+          echo "Run 'black src/ tests/' to fix formatting"
+          exit 1
+        }
+
+        # Check import sorting
+        isort --check-only --diff src/ tests/ || {
+          echo "❌ Import sorting issues found"
+          echo "Run 'isort src/ tests/' to fix imports"
+          exit 1
+        }
+
+        echo "✅ Code style checks passed"
+
+    - name: 📋 PR Comment Summary
+      uses: actions/github-script@v7
+      if: always()
+      with:
+        script: |
+          const fs = require('fs');
+
+          // Read coverage data if available
+          let coverageInfo = 'Coverage data not available';
+          try {
+            const coverage = JSON.parse(fs.readFileSync('coverage.json'));
+            coverageInfo = `🧪 **Test Coverage**: ${coverage.totals.percent_covered.toFixed(1)}%`;
+          } catch (e) {
+            console.log('Coverage file not found');
+          }
+
+          // Create PR comment with quality summary
+          const comment = `## 🔍 PR Quality Report
+
+          ${coverageInfo}
+
+          ### ✅ Quality Checks Completed
+          - 🎨 Code formatting (black)
+          - 📐 Import sorting (isort)
+          - 🔍 Code linting (flake8)
+          - 🔒 Security scan (bandit)
+          - 🧪 Test coverage analysis
+          - 📊 Code complexity check
+
+          ### 📈 Recommendations
+          - Ensure all tests pass locally before pushing
+          - Keep PRs focused and small when possible
+          - Add tests for new functionality
+          - Follow Clean Architecture principles
+
+          ---
+          *Generated by CI Pipeline - Biblioteca Liskov*
+          `;
+
+          // Try to comment on PR (fail gracefully if no permissions)
+          try {
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('PR Quality Report')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+              console.log('Updated existing PR comment');
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+              console.log('Created new PR comment');
+            }
+          } catch (error) {
+            console.log('Could not comment on PR (this is okay):', error.message);
+            console.log('Quality report generated successfully without PR comment');
+          }
+
+    - name: 💾 Archive PR analysis
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pr-quality-analysis
+        path: |
+          bandit-pr-report.json
+          coverage.json
+          .coverage

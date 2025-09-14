@@ -1,10 +1,10 @@
 """
 SQLite database connection and schema setup
 """
+
 import sqlite3
-import os
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 
 class SQLiteConnection:
@@ -39,7 +39,8 @@ class SQLiteConnection:
         cursor = self._connection.cursor()
 
         # Users table
-        cursor.execute('''
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS usuarios (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre TEXT NOT NULL,
@@ -51,10 +52,12 @@ class SQLiteConnection:
                 activo BOOLEAN DEFAULT 1,
                 fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
             )
-        ''')
+        """
+        )
 
         # Library items table
-        cursor.execute('''
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS items_biblioteca (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 titulo TEXT NOT NULL,
@@ -67,10 +70,12 @@ class SQLiteConnection:
                 fecha_adquisicion DATETIME DEFAULT CURRENT_TIMESTAMP,
                 valor_reposicion REAL
             )
-        ''')
+        """
+        )
 
         # Employees table
-        cursor.execute('''
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS empleados (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre TEXT NOT NULL,
@@ -83,10 +88,12 @@ class SQLiteConnection:
                 activo BOOLEAN DEFAULT 1,
                 fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
             )
-        ''')
+        """
+        )
 
         # Loans table
-        cursor.execute('''
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS prestamos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 usuario_id INTEGER NOT NULL,
@@ -101,10 +108,12 @@ class SQLiteConnection:
                 FOREIGN KEY (item_id) REFERENCES items_biblioteca (id),
                 FOREIGN KEY (empleado_id) REFERENCES empleados (id)
             )
-        ''')
+        """
+        )
 
         # Reservations table
-        cursor.execute('''
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS reservas (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 usuario_id INTEGER NOT NULL,
@@ -117,10 +126,12 @@ class SQLiteConnection:
                 FOREIGN KEY (item_id) REFERENCES items_biblioteca (id),
                 FOREIGN KEY (empleado_id) REFERENCES empleados (id)
             )
-        ''')
+        """
+        )
 
         # Fines table
-        cursor.execute('''
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS multas (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 usuario_id INTEGER NOT NULL,
@@ -134,7 +145,8 @@ class SQLiteConnection:
                 FOREIGN KEY (prestamo_id) REFERENCES prestamos (id),
                 FOREIGN KEY (empleado_id) REFERENCES empleados (id)
             )
-        ''')
+        """
+        )
 
         self._connection.commit()
 

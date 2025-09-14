@@ -15,7 +15,7 @@ de Python con arquitectura empresarial, utilizando:
 
 Categorías soportadas:
 - Libros para alumnos
-- Libros para bibliotecarios  
+- Libros para bibliotecarios
 - Juegos de mesa
 - Material didáctico para docentes
 - Revistas y multimedia
@@ -31,10 +31,10 @@ Autor: Sistema Biblioteca Liskov
 Versión: 1.0.0
 """
 
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
 from src.container import Container
 from src.shared.logger import get_logger
@@ -44,12 +44,12 @@ def main():
     try:
         logger = get_logger()
         logger.info("Iniciando Sistema de Biblioteca Liskov")
-        
+
         container = Container()
         console_ui = container.get_console_ui()
-        
+
         console_ui.ejecutar()
-        
+
     except KeyboardInterrupt:
         print("\n\n👋 Sistema cerrado por el usuario")
         sys.exit(0)

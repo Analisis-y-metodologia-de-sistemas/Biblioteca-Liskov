@@ -4,22 +4,22 @@ Script para inicializar empleados en la base de datos
 Crea empleados de prueba para el sistema de biblioteca
 """
 
-import sys
 import os
+import sys
 
 # Agregar el path del proyecto al sistema
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from src.container import Container
 
 
 def main():
     print("🔧 Inicializando empleados en la base de datos...")
-    
+
     try:
         container = Container()
         auth_service = container.get_auth_service()
-        
+
         # Empleados iniciales
         empleados_iniciales = [
             {
@@ -29,7 +29,7 @@ def main():
                 "usuario_sistema": "arodriguez",
                 "password": "1234",
                 "cargo": "Bibliotecario Jefe",
-                "turno": "Mañana"
+                "turno": "Mañana",
             },
             {
                 "nombre": "Carlos",
@@ -38,7 +38,7 @@ def main():
                 "usuario_sistema": "cmartinez",
                 "password": "1234",
                 "cargo": "Bibliotecario",
-                "turno": "Tarde"
+                "turno": "Tarde",
             },
             {
                 "nombre": "Maria",
@@ -47,12 +47,12 @@ def main():
                 "usuario_sistema": "mlopez",
                 "password": "1234",
                 "cargo": "Bibliotecario",
-                "turno": "Noche"
-            }
+                "turno": "Noche",
+            },
         ]
-        
+
         empleados_creados = 0
-        
+
         for datos_empleado in empleados_iniciales:
             try:
                 empleado = auth_service.crear_empleado(
@@ -62,12 +62,12 @@ def main():
                     usuario_sistema=datos_empleado["usuario_sistema"],
                     password=datos_empleado["password"],
                     cargo=datos_empleado["cargo"],
-                    turno=datos_empleado["turno"]
+                    turno=datos_empleado["turno"],
                 )
-                
+
                 print(f"✅ Empleado creado: {empleado.nombre} {empleado.apellido} ({empleado.usuario_sistema})")
                 empleados_creados += 1
-                
+
             except ValueError as e:
                 if "ya existe" in str(e):
                     print(f"⚠️  El empleado {datos_empleado['usuario_sistema']} ya existe")
@@ -75,9 +75,9 @@ def main():
                     print(f"❌ Error al crear empleado {datos_empleado['usuario_sistema']}: {str(e)}")
             except Exception as e:
                 print(f"❌ Error inesperado al crear empleado {datos_empleado['usuario_sistema']}: {str(e)}")
-        
+
         print(f"\n🎉 Proceso completado: {empleados_creados} empleados creados/actualizados")
-        
+
         if empleados_creados > 0:
             print("\n📋 Credenciales de acceso:")
             print("=" * 40)
@@ -86,9 +86,9 @@ def main():
                 print(f"Contraseña: {datos['password']}")
                 print(f"Nombre: {datos['nombre']} {datos['apellido']}")
                 print("-" * 40)
-        
+
         print("\n🔐 Utilice estas credenciales para acceder al sistema")
-        
+
     except Exception as e:
         print(f"❌ Error crítico: {str(e)}")
         sys.exit(1)

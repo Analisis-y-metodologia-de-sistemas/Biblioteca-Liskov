@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
-from typing import Optional, List
 from datetime import datetime
 from enum import Enum
-from .value_objects import Email, Money, ISBN
+from typing import List, Optional
+
+from .value_objects import Email
 
 
 class TipoUsuario(Enum):
@@ -30,14 +31,15 @@ class CategoriaItem(Enum):
 @dataclass
 class Empleado:
     """Empleados que operan el sistema (bibliotecarios/administradores)"""
+
     id: Optional[int] = None
     nombre: str = ""
     apellido: str = ""
     email: str = ""
     usuario_sistema: str = ""  # nombre de usuario para login
-    password_hash: str = ""    # contraseña hasheada
+    password_hash: str = ""  # contraseña hasheada
     cargo: str = "Bibliotecario"
-    turno: str = ""           # mañana, tarde, noche
+    turno: str = ""  # mañana, tarde, noche
     activo: bool = True
     fecha_registro: Optional[datetime] = None
 
@@ -45,6 +47,7 @@ class Empleado:
 @dataclass
 class Usuario:
     """Usuarios registrados de la biblioteca (alumnos, docentes, etc.)"""
+
     id: Optional[int] = None
     nombre: str = ""
     apellido: str = ""
@@ -54,7 +57,7 @@ class Usuario:
     telefono: Optional[str] = None
     activo: bool = True
     fecha_registro: Optional[datetime] = None
-    _multas_pendientes: List['Multa'] = field(default_factory=list, init=False)
+    _multas_pendientes: List["Multa"] = field(default_factory=list, init=False)
 
     def nombre_completo(self) -> str:
         """Retorna el nombre completo del usuario"""
@@ -122,6 +125,7 @@ class Multa:
 @dataclass
 class SesionEmpleado:
     """Sesión actual del empleado logueado"""
+
     empleado: Empleado
     fecha_login: datetime
     activa: bool = True
