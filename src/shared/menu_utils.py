@@ -2,19 +2,21 @@ import os
 import sys
 from typing import Any, Callable, List, Optional
 
+
 # Cross-platform colors (simple approach without external dependencies)
 class Colors:
     # Simple color codes that work on most terminals
     # If terminal doesn't support colors, they'll be ignored
-    HEADER = '\033[95m' if sys.stdout.isatty() else ''
-    BLUE = '\033[94m' if sys.stdout.isatty() else ''
-    CYAN = '\033[96m' if sys.stdout.isatty() else ''
-    GREEN = '\033[92m' if sys.stdout.isatty() else ''
-    YELLOW = '\033[93m' if sys.stdout.isatty() else ''
-    RED = '\033[91m' if sys.stdout.isatty() else ''
-    BOLD = '\033[1m' if sys.stdout.isatty() else ''
-    UNDERLINE = '\033[4m' if sys.stdout.isatty() else ''
-    END = '\033[0m' if sys.stdout.isatty() else ''
+    HEADER = "\033[95m" if sys.stdout.isatty() else ""
+    BLUE = "\033[94m" if sys.stdout.isatty() else ""
+    CYAN = "\033[96m" if sys.stdout.isatty() else ""
+    GREEN = "\033[92m" if sys.stdout.isatty() else ""
+    YELLOW = "\033[93m" if sys.stdout.isatty() else ""
+    RED = "\033[91m" if sys.stdout.isatty() else ""
+    BOLD = "\033[1m" if sys.stdout.isatty() else ""
+    UNDERLINE = "\033[4m" if sys.stdout.isatty() else ""
+    END = "\033[0m" if sys.stdout.isatty() else ""
+
 
 # Aliases for backward compatibility
 class Fore:
@@ -24,12 +26,15 @@ class Fore:
     RED = Colors.RED
     BLUE = Colors.BLUE
 
+
 class Style:
     BRIGHT = Colors.BOLD
     RESET_ALL = Colors.END
 
+
 class Back:
-    GREEN = '\033[42m' if sys.stdout.isatty() else ''
+    GREEN = "\033[42m" if sys.stdout.isatty() else ""
+
 
 # Sistema simplificado basado en input() estándar
 

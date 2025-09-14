@@ -249,8 +249,11 @@ class PrestamoRepository(IPrestamoRepository):
     def listar_vencidos(self) -> List[Prestamo]:
         """Get all overdue loans"""
         from datetime import datetime
+
         now = datetime.now().isoformat()
-        rows = self.orm.select(self.table, "activo = ? AND fecha_devolucion_esperada < ? AND fecha_devolucion_real IS NULL", (True, now))
+        rows = self.orm.select(
+            self.table, "activo = ? AND fecha_devolucion_esperada < ? AND fecha_devolucion_real IS NULL", (True, now)
+        )
         return [self._row_to_entity(row) for row in rows]
 
     def actualizar(self, prestamo: Prestamo) -> Prestamo:
@@ -326,6 +329,7 @@ class ReservaRepository(IReservaRepository):
     def listar_expiradas(self) -> List[Reserva]:
         """Get all expired reservations"""
         from datetime import datetime
+
         now = datetime.now().isoformat()
         rows = self.orm.select(self.table, "activa = ? AND fecha_expiracion < ?", (True, now))
         return [self._row_to_entity(row) for row in rows]
