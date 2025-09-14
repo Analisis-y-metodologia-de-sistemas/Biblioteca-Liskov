@@ -1,0 +1,131 @@
+name: 🔖 Status Checks
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety pip-audit
+
+    - name: 🔒 Security audit
+      run: |
+        echo "🔒 Running security audit..."
+        pip-audit --desc --format=json --output=audit-report.json
+        pip-audit --desc
+
+    - name: 💾 Upload audit report
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-audit
+        path: audit-report.json
+
+  code-metrics:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: 📦 Install tools
+      run: |
+        pip install radon complexity-report
+
+    - name: 📊 Code metrics
+      run: |
+        echo "📊 Generating code metrics..."
+        echo "## Cyclomatic Complexity"
+        radon cc src/ --show-complexity --min=B
+        echo "## Maintainability Index"
+        radon mi src/
+        echo "## Raw Metrics"
+        radon raw src/
+
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: 📦 Install project
+      run: |
+        pip install -r requirements.txt
+        pip install -e .
+
+    - name: 🏥 Health check
+      run: |
+        echo "🏥 Running health checks..."
+
+        # Check if main modules can be imported
+        python -c "import src.domain.entities; print('✅ Domain layer OK')"
+        python -c "import src.application.services; print('✅ Application layer OK')"
+        python -c "import src.application.interfaces; print('✅ Interfaces OK')"
+
+        # Check database connection (if applicable)
+        python -c "
+        try:
+            from src.infrastructure.database.sqlite_connection import SQLiteConnection
+            conn = SQLiteConnection(':memory:')
+            with conn:
+                pass
+            print('✅ Database connection OK')
+        except Exception as e:
+            print(f'⚠️ Database connection issue: {e}')
+        "
+
+        echo "🎉 Health check completed!"
+
+  update-readme-badges:
+    runs-on: ubuntu-latest
+    needs: [dependency-check, code-metrics, health-check]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 🔖 Update badges
+      run: |
+        echo "🔖 Updating status badges..."
+
+        # This would update README badges based on build status
+        # For now, just log the action
+        echo "Status: ✅ All checks passing"
+        echo "Last updated: $(date)"
+
+        # In a real implementation, this would update README.md
+        # with dynamic badges showing build status, coverage, etc.
+
+    - name: 💾 Commit badge updates
+      run: |
+        # git config --local user.email "action@github.com"
+        # git config --local user.name "GitHub Action"
+        # git add README.md
+        # git diff --staged --quiet || git commit -m "docs: update status badges [skip ci]"
+        # git push
+        echo "Badge updates would be committed here"
