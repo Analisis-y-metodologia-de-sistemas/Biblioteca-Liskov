@@ -81,6 +81,16 @@ class UsuarioRepository(IUsuarioRepository):
         affected_rows = self.orm.delete(self.table, "id = ?", (id,))
         return affected_rows > 0
 
+    def buscar_por_nombre(self, nombre: str) -> List[Usuario]:
+        """Search users by name (partial match)"""
+        rows = self.orm.select(self.table, "nombre LIKE ? OR apellido LIKE ?", (f"%{nombre}%", f"%{nombre}%"))
+        return [self._row_to_entity(row) for row in rows]
+
+    def listar_por_tipo(self, tipo: TipoUsuario) -> List[Usuario]:
+        """Get users by type (ALUMNO, DOCENTE, etc.)"""
+        rows = self.orm.select(self.table, "tipo = ?", (tipo.value,))
+        return [self._row_to_entity(row) for row in rows]
+
 
 class ItemBibliotecaRepository(IItemBibliotecaRepository):
     def __init__(self, orm: ORM):
@@ -133,12 +143,20 @@ class ItemBibliotecaRepository(IItemBibliotecaRepository):
         rows = self.orm.select(self.table, "autor LIKE ?", (f"%{autor}%",))
         return [self._row_to_entity(row) for row in rows]
 
-    def listar_por_categoria(self, categoria: str) -> List[ItemBiblioteca]:
-        rows = self.orm.select(self.table, "categoria = ?", (categoria,))
+    def buscar_por_isbn(self, isbn: str) -> Optional[ItemBiblioteca]:
+        """Get item by ISBN"""
+        rows = self.orm.select(self.table, "isbn = ?", (isbn,))
+        return self._row_to_entity(rows[0]) if rows else None
+
+    def listar_por_categoria(self, categoria: CategoriaItem) -> List[ItemBiblioteca]:
+        """Get items by category"""
+        rows = self.orm.select(self.table, "categoria = ?", (categoria.value,))
         return [self._row_to_entity(row) for row in rows]
 
-    def buscar_por_categoria(self, categoria: CategoriaItem) -> List[ItemBiblioteca]:
-        return self.listar_por_categoria(categoria.value)
+    def listar_por_estado(self, estado: EstadoItem) -> List[ItemBiblioteca]:
+        """Get items by status"""
+        rows = self.orm.select(self.table, "estado = ?", (estado.value,))
+        return [self._row_to_entity(row) for row in rows]
 
     def listar_todos(self) -> List[ItemBiblioteca]:
         rows = self.orm.select(self.table)
@@ -218,10 +236,32 @@ class PrestamoRepository(IPrestamoRepository):
     def listar_prestamos_activos(self) -> List[Prestamo]:
         return self.listar_activos()
 
+    def listar_todos(self) -> List[Prestamo]:
+        """Get all loans"""
+        rows = self.orm.select(self.table)
+        return [self._row_to_entity(row) for row in rows]
+
+    def listar_por_item(self, item_id: int) -> List[Prestamo]:
+        """Get loan history for a specific item"""
+        rows = self.orm.select(self.table, "item_id = ?", (item_id,))
+        return [self._row_to_entity(row) for row in rows]
+
+    def listar_vencidos(self) -> List[Prestamo]:
+        """Get all overdue loans"""
+        from datetime import datetime
+        now = datetime.now().isoformat()
+        rows = self.orm.select(self.table, "activo = ? AND fecha_devolucion_esperada < ? AND fecha_devolucion_real IS NULL", (True, now))
+        return [self._row_to_entity(row) for row in rows]
+
     def actualizar(self, prestamo: Prestamo) -> Prestamo:
         data = self._entity_to_dict(prestamo)
         self.orm.update(self.table, data, "id = ?", (prestamo.id,))
         return prestamo
+
+    def eliminar(self, id: int) -> bool:
+        """Delete loan by ID"""
+        affected_rows = self.orm.delete(self.table, "id = ?", (id,))
+        return affected_rows > 0
 
 
 class ReservaRepository(IReservaRepository):
@@ -278,10 +318,27 @@ class ReservaRepository(IReservaRepository):
     def cancelar_reserva(self, id: int):
         self.orm.update(self.table, {"activa": False}, "id = ?", (id,))
 
+    def listar_todas(self) -> List[Reserva]:
+        """Get all reservations"""
+        rows = self.orm.select(self.table)
+        return [self._row_to_entity(row) for row in rows]
+
+    def listar_expiradas(self) -> List[Reserva]:
+        """Get all expired reservations"""
+        from datetime import datetime
+        now = datetime.now().isoformat()
+        rows = self.orm.select(self.table, "activa = ? AND fecha_expiracion < ?", (True, now))
+        return [self._row_to_entity(row) for row in rows]
+
     def actualizar(self, reserva: Reserva) -> Reserva:
         data = self._entity_to_dict(reserva)
         self.orm.update(self.table, data, "id = ?", (reserva.id,))
         return reserva
+
+    def eliminar(self, id: int) -> bool:
+        """Delete reservation by ID"""
+        affected_rows = self.orm.delete(self.table, "id = ?", (id,))
+        return affected_rows > 0
 
 
 class MultaRepository(IMultaRepository):
@@ -338,10 +395,25 @@ class MultaRepository(IMultaRepository):
 
         self.orm.update(self.table, {"pagada": True, "fecha_pago": fecha_pago.isoformat()}, "id = ?", (id,))
 
+    def listar_todas(self) -> List[Multa]:
+        """Get all fines"""
+        rows = self.orm.select(self.table)
+        return [self._row_to_entity(row) for row in rows]
+
+    def listar_pagadas(self) -> List[Multa]:
+        """Get all paid fines"""
+        rows = self.orm.select(self.table, "pagada = ?", (True,))
+        return [self._row_to_entity(row) for row in rows]
+
     def actualizar(self, multa: Multa) -> Multa:
         data = self._entity_to_dict(multa)
         self.orm.update(self.table, data, "id = ?", (multa.id,))
         return multa
+
+    def eliminar(self, id: int) -> bool:
+        """Delete fine by ID"""
+        affected_rows = self.orm.delete(self.table, "id = ?", (id,))
+        return affected_rows > 0
 
 
 class EmpleadoRepository(IEmpleadoRepository):
@@ -387,9 +459,14 @@ class EmpleadoRepository(IEmpleadoRepository):
         rows = self.orm.select(self.table, "id = ?", (id,))
         return self._row_to_entity(rows[0]) if rows else None
 
-    def obtener_por_usuario_sistema(self, usuario: str) -> Optional[Empleado]:
-        rows = self.orm.select(self.table, "usuario_sistema = ?", (usuario,))
+    def obtener_por_usuario(self, usuario_sistema: str) -> Optional[Empleado]:
+        """Get employee by system username"""
+        rows = self.orm.select(self.table, "usuario_sistema = ?", (usuario_sistema,))
         return self._row_to_entity(rows[0]) if rows else None
+
+    def obtener_por_usuario_sistema(self, usuario: str) -> Optional[Empleado]:
+        """Legacy method - use obtener_por_usuario instead"""
+        return self.obtener_por_usuario(usuario)
 
     def listar_todos(self) -> List[Empleado]:
         rows = self.orm.select(self.table)
