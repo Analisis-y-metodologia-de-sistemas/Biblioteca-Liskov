@@ -6,12 +6,10 @@ Script para cargar datos de demostración en el sistema de biblioteca.
 import sys
 import os
 
-
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 from src.container import Container
 from src.domain.entities import TipoUsuario, CategoriaItem
-
 
 def cargar_datos_demo():
     print("🔄 Cargando datos de demostración...")
